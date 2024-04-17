@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:s_chat/res/components/round_button.dart';
 import 'package:s_chat/screens/auth_screens/otp_screen.dart';
 import 'package:s_chat/screens/home_screens/setting_page.dart';
+
+import '../../res/routes/routes_name.dart';
 
 class PhoneAuth extends StatefulWidget {
   const PhoneAuth({super.key});
@@ -137,8 +140,9 @@ class _PhoneAuthState extends State<PhoneAuth> {
                 RoundButton(
                   title: "Get OTP",
                   onPress: () async {
-                    final mobile =  _phoneController.text.trim();
-                    await registerUser(mobile, context);
+                    // final mobile =  _phoneController.text.trim();
+                    // await registerUser(mobile, context);
+                    Get.toNamed(RouteName.homeScreen);
                   },
                   width: 110,
                   height: 45,
