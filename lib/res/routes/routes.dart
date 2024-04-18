@@ -48,7 +48,7 @@ class AppRoutes{
 
 
     GetPage(name: RouteName.notesEditScreen,
-        page: ()=> const NotesEditScreen(),
+        page: ()=> NotesEditScreen(onSave: (NotesModel ) {  }, ),
       transitionDuration: const Duration(microseconds: 250),
       transition: Transition.leftToRightWithFade
     ),

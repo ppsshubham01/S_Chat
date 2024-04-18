@@ -1,19 +1,22 @@
 import 'dart:async';
+import 'dart:io';
 
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:s_chat/res/routes/routes.dart';
-import 'package:s_chat/screens/auth_screens/login_screen.dart';
-import 'package:s_chat/screens/auth_screens/signUp_screen.dart';
-import 'package:s_chat/screens/auth_screens/welcom_phone_auth.dart';
-// import 'firebase_options.dart';
+import 'package:s_chat/splash_screen.dart';
 
-Future<void> main() async {
-    // WidgetsFlutterBinding.ensureInitialized();
-    // await Firebase.initializeApp(
-    //   // options: DefaultFirebaseOptions.currentPlatform,
-    // );
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Directory appDocumentDire = await getApplicationDocumentsDirectory();
+  Hive.init(appDocumentDire.path);
+  await Hive.openBox('notesHIveData');
+  // await Firebase.initializeApp(
+  //   // options: DefaultFirebaseOptions.currentPlatform,
+  // );
   runApp(const MyApp());
 }
 
@@ -24,12 +27,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+    // return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      // home: const PhoneAuth(),
+      // home: const SplashScreen(),
       getPages: AppRoutes.appRoutes(),
     );
   }
