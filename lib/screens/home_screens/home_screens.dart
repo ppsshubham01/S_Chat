@@ -13,6 +13,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
+  final ValueNotifier<int> valueNotifier = ValueNotifier(0);
   int _selectedIndex = 0;
 
   void navigateBottomBar(int index){

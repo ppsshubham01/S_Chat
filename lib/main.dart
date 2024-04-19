@@ -1,4 +1,4 @@
-import 'dart:async';
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:s_chat/res/routes/routes.dart';
-import 'package:s_chat/splash_screen.dart';
+import 'package:s_chat/theme.dart';
 
 
 void main() async {
@@ -17,22 +17,21 @@ void main() async {
   // await Firebase.initializeApp(
   //   // options: DefaultFirebaseOptions.currentPlatform,
   // );
-  runApp(const MyApp());
+  runApp( MyApp(appTheme: AppTheme(),));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.appTheme});
+  final AppTheme appTheme;
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
     // return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: appTheme.light,
+      darkTheme: appTheme.dark,
+      themeMode: ThemeMode.light,
       // home: const SplashScreen(),
       getPages: AppRoutes.appRoutes(),
     );
