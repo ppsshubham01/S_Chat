@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:s_chat/model/notes_models/noteM.dart';
+import 'package:s_chat/screens/home_screens/notes_page.dart';
 
 class NotesEditScreen extends StatefulWidget {
   final NotesModel? notesModel;
   final Function(NotesModel) onSave;
-  NotesEditScreen({super.key, this.notesModel, required this.onSave});
+
+  const NotesEditScreen({super.key, this.notesModel, required this.onSave});
 
   @override
   State<NotesEditScreen> createState() => _NotesEditScreenState();
@@ -15,24 +18,25 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
   late TextEditingController contentController = TextEditingController();
   DateTime _lastEditText = DateTime.now();
 
-
-
   void _addressControllerListener() {
     print(titleController.text);
   }
 
-  void saveNotes(){
-    if(titleController.text.isNotEmpty && contentController.text.isNotEmpty){
-      final note = NotesModel(title: titleController.text, content:contentController.text);
-      widget.onSave(note);
-      Navigator.pop(context);
+  void saveNotes() {
+    // HiveNotesModel saveNotes = HiveNotesModel(id: DateTime.now().toString(), title: titleController.text, content: contentController.text);
+    // setState(() { });
+    if (titleController.text.isNotEmpty && contentController.text.isNotEmpty) {
+      final note = NotesModel(
+          title: titleController.text, content: contentController.text);
+      // widget.onSave(note);
+      // Get.off(()=> NotesPage());
+      Navigator.pop(context, note);
     }
-    setState(() {});
+    titleController.clear();
+    contentController.clear();
   }
-  
 
-
-  void onTextChange(){
+  void onTextChange() {
     setState(() {
       _lastEditText = DateTime.now();
     });
@@ -41,21 +45,26 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    // titleController.addListener(() { _addressControllerListener();});
+    titleController.addListener(() {
+      _addressControllerListener();
+    });
     super.initState();
-    titleController = TextEditingController(text: widget.notesModel?.title ?? '' );
-    contentController = TextEditingController(text: widget.notesModel?.content ?? '');
-    
+    titleController =
+        TextEditingController(text: widget.notesModel?.title ?? '');
+    contentController =
+        TextEditingController(text: widget.notesModel?.content ?? '');
+
     contentController.addListener(onTextChange);
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
-    titleController.removeListener(() {_addressControllerListener(); });
+    // titleController.removeListener(() {_addressControllerListener(); });
     contentController.removeListener(onTextChange);
     super.dispose();
   }
+
   //******************************Listener Widget use in that for good User interaction************************************
 
   @override
@@ -67,7 +76,7 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
         resizeToAvoidBottomInset: true,
         // backgroundColor: Color(0xFF252525),
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(50),
+          preferredSize: const Size.fromHeight(50),
           child: AppBar(
             backgroundColor: Colors.green,
             // automaticallyImplyLeading: false,
@@ -78,8 +87,9 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
                 child: TextField(
                   controller: titleController,
                   decoration: const InputDecoration(
-                    // helperText: ,
-                      border: InputBorder.none, hintText: 'Your Title'),
+                      // helperText: ,
+                      border: InputBorder.none,
+                      hintText: 'Your Title'),
                 ),
               ),
             ),
@@ -113,10 +123,13 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
                   Text(_lastEditText.toString())
                 ],
               ),
-              const Expanded(
+              Expanded(
                 child: TextField(
-                  decoration: InputDecoration(hintText: "Start Writing here...",),
-                  scrollPadding: EdgeInsets.all(20.0),
+                  controller: contentController,
+                  decoration: const InputDecoration(
+                    hintText: "Start Writing here...",
+                  ),
+                  scrollPadding: const EdgeInsets.all(20.0),
                   keyboardType: TextInputType.multiline,
                   autofocus: true,
                   maxLines: null,
@@ -128,8 +141,6 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
                   cursorWidth: 8.0,
                 ),
               ),
-
-
             ],
             // child: ,
           ),

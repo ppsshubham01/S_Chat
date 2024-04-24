@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SettingPage extends StatefulWidget {
   final User? user;
@@ -24,6 +25,12 @@ class _SettingPageState extends State<SettingPage> {
     return Scaffold(
       appBar: AppBar(
 
+        actions: [
+          IconButton(onPressed: ()async{
+            await GoogleSignIn().signOut();
+            FirebaseAuth.instance.signOut();
+          }, icon: const Icon(Icons.power_settings_new_outlined))
+        ],
       ),
       drawer: Drawer(
         child: ListView(
@@ -59,9 +66,13 @@ class _SettingPageState extends State<SettingPage> {
       body: Container(
         padding: const EdgeInsets.all(32),
         child: const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+
+            Center(child: CircleAvatar(radius: 55,backgroundImage: NetworkImage('https://source.unsplash.com/random'),)),
+            SizedBox(height: 5,),
+            Center(child: Text("pps.shubham01@.com")),
             Text(
               "You are Logged in succesfully",
               style: TextStyle(color: Colors.lightBlue, fontSize: 32),

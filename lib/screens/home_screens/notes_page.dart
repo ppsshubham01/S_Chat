@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:s_chat/controllers/note_controlller/notes_controller.dart';
 import 'package:s_chat/model/notes_models/noteM.dart';
 import 'package:s_chat/res/components/round_Textfield.dart';
 import 'package:s_chat/screens/notes_screen/notes_editScreen.dart';
+import 'package:s_chat/services/hiveDb/database.dart';
 
 class NotesPage extends StatefulWidget {
   const NotesPage({super.key});
@@ -13,22 +13,41 @@ class NotesPage extends StatefulWidget {
 }
 
 class _NotesPageState extends State<NotesPage> {
-  List<NotesModel> notesOfList = [];
+  List<NotesModel> notesOfList = [
+    NotesModel(title: "oh achha essa", content: 'Welcome to S-Chat'),
+    NotesModel(title: "Hello There", content: 'Achha laga apse dubara mil kr'),
+  ];
 
+  HiveHelperDB hiveHelperDB = HiveHelperDB();
+  // NotesModel notesModelss = NotesModel(title: 'title', content: 'content');
   final TextEditingController searchController = TextEditingController();
-  final NoteController noteController = Get.put(NoteController());
 
   void addOrEditNote(NotesModel notesModel) {
     setState(() {
       var existNote = notesOfList.firstWhere(
         (n) => n.title == notesModel.title,
+        // orElse: null,
       );
+      print("existNote: $existNote");
       if (existNote != null) {
         existNote.content = notesModel.content;
       } else {
         notesOfList.add(notesModel);
       }
     });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchAndSetData();
+  }
+
+  void fetchAndSetData() {
+    List<NotesModel> tempnoteList = hiveHelperDB.fetchData();
+    notesOfList.addAll(tempnoteList);
+    setState(() {});
   }
 
   @override
@@ -54,9 +73,21 @@ class _NotesPageState extends State<NotesPage> {
         ),
         actions: [
           IconButton(
-              onPressed: () {
-                // Get.toNamed(RouteName.notesEditScreen); question for routes in passing arguments
-                Get.to(() => NotesEditScreen(onSave: addOrEditNote));
+              onPressed: () async {
+                // // Get.toNamed(RouteName.notesEditScreen); question for routes in passing arguments
+                // NotesModel dinalD =Get.to(() => NotesEditScreen(onSave: addOrEditNote)) as NotesModel;
+                NotesModel finalData = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) =>
+                            NotesEditScreen(
+                                // notesModel: notesModelss,
+                                onSave: addOrEditNote)));
+                print("dknsdknvjknvjksdnvjdksn : ${finalData.title}");
+                setState(() {
+                  // notesModelss = finalData;
+                  notesOfList.add(finalData);
+                });
               },
               icon: const Icon(Icons.add)),
           IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
@@ -85,27 +116,33 @@ class _NotesPageState extends State<NotesPage> {
             const SizedBox(
               height: 10,
             ),
-             Flexible(
-                child: ListView.builder(
-                    itemCount: notesOfList.length,
-                    // itemCount: noteController.notes.length,
-                    itemBuilder: (context, index) {
-                      final note = notesOfList[index];
-                      return ListTile(
-                        title: Text(note.title),
-                        // title: Text(noteController.notes[index].title),
-                        subtitle: Text(note.content.split('\n').first),
-                        // subtitle: Text(noteController.notes[index].content.split('\n').first),
-                        onTap: () {
+            Flexible(
+              child: ListView.builder(
+                  itemCount: notesOfList.length,
+                  itemBuilder: (context, index) {
+                    final note = notesOfList[index];
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListTile(
+                        title: Text(notesOfList[index].title),
+                        subtitle:
+                            Text(notesOfList[index].content.split('\n').first),
+                        shape: RoundedRectangleBorder(
+                            side:
+                                const BorderSide(color: Colors.black, width: 1),
+                            borderRadius: BorderRadius.circular(10)),
+                        onTap: () async {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (_) =>
-                                      NotesEditScreen(onSave: addOrEditNote)));
+                                  builder: (_) => NotesEditScreen(
+                                      notesModel: note,
+                                      onSave: addOrEditNote)));
                         },
-                      );
-                    }),
-              ),
+                      ),
+                    );
+                  }),
+            ),
           ],
         ),
       ),

@@ -46,12 +46,12 @@ class AppRoutes{
       transition: Transition.leftToRightWithFade
     ),
 
-
-    GetPage(name: RouteName.notesEditScreen,
-        page: ()=> NotesEditScreen(onSave: (NotesModel ) {  }, ),
-      transitionDuration: const Duration(microseconds: 250),
-      transition: Transition.leftToRightWithFade
-    ),
+    //
+    // GetPage(name: RouteName.notesEditScreen,
+    //     page: ()=> NotesEditScreen(onSave: (NotesModel ) {  }, ),
+    //   transitionDuration: const Duration(microseconds: 250),
+    //   transition: Transition.leftToRightWithFade
+    // ),
 
   ];
 }

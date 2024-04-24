@@ -1,22 +1,26 @@
 
-import 'dart:io';
-
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:s_chat/res/routes/routes.dart';
 import 'package:s_chat/theme.dart';
 
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  Directory appDocumentDire = await getApplicationDocumentsDirectory();
-  Hive.init(appDocumentDire.path);
-  await Hive.openBox('notesHIveData');
-  // await Firebase.initializeApp(
-  //   // options: DefaultFirebaseOptions.currentPlatform,
-  // );
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  final appDocumentDire = await getApplicationDocumentsDirectory();
+  // Hive.init(appDocumentDire.path);
+  await Hive.initFlutter();
+  // Hive.registerAdapter(adapter);
+  await Hive.openBox('notesHiveData');
+
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  FlutterNativeSplash.remove();
+
+  // await Firebase.initializeApp();
   runApp( MyApp(appTheme: AppTheme(),));
 }
 

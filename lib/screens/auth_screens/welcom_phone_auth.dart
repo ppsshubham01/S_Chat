@@ -1,11 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:s_chat/res/components/round_button.dart';
 import 'package:s_chat/screens/auth_screens/otp_screen.dart';
+import 'package:s_chat/screens/home_screens/home_screens.dart';
 import 'package:s_chat/screens/home_screens/setting_page.dart';
 
-import '../../res/routes/routes_name.dart';
 
 class PhoneAuth extends StatefulWidget {
   const PhoneAuth({super.key});
@@ -80,6 +81,18 @@ class _PhoneAuthState extends State<PhoneAuth> {
     );
   }
 
+  // List<String> googleScopes = <String>[
+  //   'email',
+  //   'https://www.googleapis.com/auth/contacts.readonly',
+  // ];
+  //
+  // GoogleSignIn _googleSignIn = GoogleSignIn(
+  //   // Optional clientId
+  //   // clientId: 'your-client_id.apps.googleusercontent.com',
+  //   scopes: googleScopes,
+  // );
+
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -142,17 +155,70 @@ class _PhoneAuthState extends State<PhoneAuth> {
                   onPress: () async {
                     // final mobile =  _phoneController.text.trim();
                     // await registerUser(mobile, context);
-                    Get.toNamed(RouteName.homeScreen);
+                    // Get.toNamed(RouteName.homeScreen);
+                    Get.off(const HomeScreen());
                   },
                   width: 110,
                   height: 45,
                   buttonColor: Colors.blueGrey,
-                )
+                ),
+                const SizedBox(height: 10,),
+                const Divider(thickness: 3,),
+                IconButton(onPressed: (){signInWithGoogle();}, icon: const Icon(Icons.g_mobiledata_outlined,size: 45,))
               ],
             ),
           ),
         ),
       ),
     );
+  }
+}
+
+
+// Future<void> signInWithGoogle() async {
+//   try {
+//     final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
+//     final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount!.authentication;
+//
+//     final AuthCredential credential = GoogleAuthProvider.credential(
+//       accessToken: googleSignInAuthentication.accessToken,
+//       idToken: googleSignInAuthentication.idToken,
+//     );
+//
+//     final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+//     final User? user = userCredential.user;
+//
+//     // Use the user object for further operations or navigate to a new screen.
+//   } catch (e) {
+//     print(e.toString());
+//   }
+// }
+
+// Future<UserCredential>
+signInWithGoogle() async {
+
+  try {
+    // Trigger the authentication flow
+    GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    // Obtain the auth details from the request
+
+    GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+    // Create a new credential
+    AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    UserCredential user = await FirebaseAuth.instance.signInWithCredential(credential);
+    print('user email: ${user.user?.displayName}');
+    // Once signed in, return the UserCredential
+    // if(user.user != null){
+    //   Get.to(HomeScreen());
+    // }
+    // return await FirebaseAuth.instance.signInWithCredential(credential);
+  } catch (e) {
+    print('Google signin error $e');
   }
 }
