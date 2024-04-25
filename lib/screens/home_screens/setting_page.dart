@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class SettingPage extends StatefulWidget {
@@ -12,24 +12,20 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-  int _selectedIndex = 0;
+  User? userShubham = FirebaseAuth.instance.currentUser;
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-
         actions: [
-          IconButton(onPressed: ()async{
-            await GoogleSignIn().signOut();
-            FirebaseAuth.instance.signOut();
-          }, icon: const Icon(Icons.power_settings_new_outlined))
+          IconButton(
+              onPressed: () async {
+                await GoogleSignIn().signOut();
+                FirebaseAuth.instance.signOut();
+              },
+              icon: const Icon(Icons.logout))
         ],
       ),
       drawer: Drawer(
@@ -62,23 +58,184 @@ class _SettingPageState extends State<SettingPage> {
           ],
         ),
       ),
-
       body: Container(
-        padding: const EdgeInsets.all(32),
-        child: const Column(
+        padding: const EdgeInsets.all(22),
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-
-            Center(child: CircleAvatar(radius: 55,backgroundImage: NetworkImage('https://source.unsplash.com/random'),)),
-            SizedBox(height: 5,),
-            Center(child: Text("pps.shubham01@.com")),
-            Text(
-              "You are Logged in succesfully",
+            Center(
+                child: CircleAvatar(
+                radius: 55,
+                backgroundImage: NetworkImage(userShubham?.photoURL ??
+                    'https://source.unsplash.com/random'),
+              ),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Center(
+                child:
+                    Text(userShubham?.displayName ?? 'No Name is there')),
+            Center(child: Text(userShubham?.email ?? 'No email is there')),
+            const Text(
+              "You are Logged in successfully",
               style: TextStyle(color: Colors.lightBlue, fontSize: 32),
             ),
-            SizedBox(
+            const SizedBox(
               height: 16,
+            ),
+            const Text(
+              "Profile",
+              style: TextStyle(color: Colors.lightBlue, fontSize: 20),
+            ),
+
+            Container(
+              color: Colors.black12,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () {},
+                      child: const Row(
+                        children: [
+                          Icon(Icons.perm_identity_outlined),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text("Personal Data")
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () {},
+                      child: const Row(
+                        children: [
+                          Icon(Icons.language_outlined),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text("Language")
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () {},
+                      child: const Row(
+                        children: [
+                          Icon(Icons.notifications),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text("Notification")
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () {},
+                      child: const Row(
+                        children: [
+                          Icon(Icons.contrast_outlined),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text("Theme")
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            const Text(
+              "Security",
+              style: TextStyle(color: Colors.lightBlue, fontSize: 20),
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Container(
+              color: Colors.black12,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () {},
+                      child: const Row(
+                        children: [
+                          Icon(Icons.password_sharp),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text("Password")
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () {},
+                      child: const Row(
+                        children: [
+                          Icon(Icons.privacy_tip_outlined),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text("Privacy Policy")
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () {},
+                      child: const Row(
+                        children: [
+                          Icon(Icons.logout_rounded),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text("Log Out")
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InkWell(
+                      onTap: () {},
+                      child: const Row(
+                        children: [
+                          Icon(Icons.contrast_outlined),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text("Theme")
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 5,
             ),
             // Text("${widget.user.phoneNumber}", style: TextStyle(color: Colors.grey, ),),
           ],

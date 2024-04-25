@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:s_chat/res/components/round_button.dart';
+import 'package:s_chat/screens/auth_screens/signUp_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,6 +14,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
+
+
+  void signIn(){}
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +72,22 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(
               height: 15,
             ),
-            RoundButton(title: "Login", onPress: () {},height: 43,width: 100,)
+            RoundButton(title: "Login", onPress: () {
+              signIn;
+            },height: 43,width: 100,),
+            const SizedBox(
+              height: 8,
+            ),
+            InkWell(
+              onTap: (){
+                Get.to(const SignupScreen());
+              },
+              child: const Text(
+                "Register",
+                style: TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.bold),
+              ),
+            ),
           ],
         ),
       ),

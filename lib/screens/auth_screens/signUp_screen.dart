@@ -11,6 +11,7 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
+  final TextEditingController _confompassController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +81,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 fillColor: Colors.grey[200],
                 hintText: 'Conform Password',
               ),
-              controller: _passController,
+              controller: _confompassController,
               obscureText: true,
               obscuringCharacter: '@',
               keyboardType: TextInputType.visiblePassword,

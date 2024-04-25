@@ -7,6 +7,7 @@ import 'package:s_chat/screens/auth_screens/otp_screen.dart';
 import 'package:s_chat/screens/home_screens/home_screens.dart';
 import 'package:s_chat/screens/home_screens/setting_page.dart';
 
+import 'login_screen.dart';
 
 class PhoneAuth extends StatefulWidget {
   const PhoneAuth({super.key});
@@ -17,8 +18,7 @@ class PhoneAuth extends StatefulWidget {
 
 class _PhoneAuthState extends State<PhoneAuth> {
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _passController = TextEditingController();
-  final TextEditingController _codeController = TextEditingController();
+  Rx<User?> savedUser = Rx<User?>(null);
 
   Future registerUser(String mobile, BuildContext context) async {
     FirebaseAuth auth0 = FirebaseAuth.instance;
@@ -30,8 +30,10 @@ class _PhoneAuthState extends State<PhoneAuth> {
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                  builder: (context) => SettingPage(user: value.user )));
-        }).catchError((e){print(e);});
+                  builder: (context) => SettingPage(user: value.user)));
+        }).catchError((e) {
+          print(e);
+        });
       },
       verificationFailed: (FirebaseAuthException e) {
         if (e.code == 'invalid-phone-number') {
@@ -39,7 +41,12 @@ class _PhoneAuthState extends State<PhoneAuth> {
         }
       },
       codeSent: (String verificationId, int? resendToken) async {
-        Navigator.push(context, MaterialPageRoute(builder: (context)=> OtpScreen(verificationID: verificationId,)));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => OtpScreen(
+                      verificationID: verificationId,
+                    )));
         // // Update the UI - wait for the user to enter the SMS code
         // String smsCode = 'xxxx';
         // showDialog(context: context, barrierDismissible: false,builder: (context)=> AlertDialog(
@@ -81,6 +88,35 @@ class _PhoneAuthState extends State<PhoneAuth> {
     );
   }
 
+  signInWithGoogle() async {
+    try {
+      GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+      AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+
+      UserCredential user =
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      savedUser.value = user.user;
+
+      print('user name: ${user.user?.displayName}');
+      print('user email: ${user.user?.email}');
+      print('savedUser.value: ${savedUser.value!}');
+      // Once signed in, return the UserCredential
+      // if(user.user != null){
+      //   Get.to(HomeScreen());
+      // }
+      // return await FirebaseAuth.instance.signInWithCredential(credential);
+    } catch (e) {
+      print('Google signin error $e');
+    }
+  }
+
+
   // List<String> googleScopes = <String>[
   //   'email',
   //   'https://www.googleapis.com/auth/contacts.readonly',
@@ -91,7 +127,6 @@ class _PhoneAuthState extends State<PhoneAuth> {
   //   // clientId: 'your-client_id.apps.googleusercontent.com',
   //   scopes: googleScopes,
   // );
-
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +141,8 @@ class _PhoneAuthState extends State<PhoneAuth> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text("Welcome Back Home\n it's Dad's Home"),
+                const Text(
+                    "Welcome Back Home\n it's Dad's Home..You've been missed!"),
                 const SizedBox(
                   height: 15,
                 ),
@@ -123,7 +159,6 @@ class _PhoneAuthState extends State<PhoneAuth> {
                     filled: true,
                     fillColor: Colors.grey,
                     hintText: 'Enter Phone Number',
-
                   ),
                   controller: _phoneController,
                   // keyboardType: TextInputType.number,
@@ -153,18 +188,53 @@ class _PhoneAuthState extends State<PhoneAuth> {
                 RoundButton(
                   title: "Get OTP",
                   onPress: () async {
-                    // final mobile =  _phoneController.text.trim();
-                    // await registerUser(mobile, context);
+                    final mobile = _phoneController.text.trim();
+                    await registerUser(mobile, context);
                     // Get.toNamed(RouteName.homeScreen);
-                    Get.off(const HomeScreen());
+                    Get.off(OtpScreen(
+                      verificationID: '',
+                    ));
                   },
                   width: 110,
                   height: 45,
-                  buttonColor: Colors.blueGrey,
+                  textColor: Colors.white,
+                  buttonColor: Colors.black,
                 ),
-                const SizedBox(height: 10,),
-                const Divider(thickness: 3,),
-                IconButton(onPressed: (){signInWithGoogle();}, icon: const Icon(Icons.g_mobiledata_outlined,size: 45,))
+                const SizedBox(
+                  height: 10,
+                ),
+                const Divider(
+                  thickness: 3,
+                ),
+                IconButton(
+                    onPressed: () {
+                      signInWithGoogle();
+                    },
+                    icon: const Icon(
+                      Icons.g_mobiledata_outlined,
+                      size: 45,
+                    )),
+                const SizedBox(
+                  height: 8,
+                ),
+                const Text(
+                  "Not Member! Register",
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+                InkWell(
+                  onTap: (){
+                    Get.to(const LoginScreen());
+                  },
+                  child: const Text(
+                    "Login Via Email",
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.bold),
+                  ),
+                ),
               ],
             ),
           ),
@@ -174,51 +244,4 @@ class _PhoneAuthState extends State<PhoneAuth> {
   }
 }
 
-
-// Future<void> signInWithGoogle() async {
-//   try {
-//     final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
-//     final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount!.authentication;
-//
-//     final AuthCredential credential = GoogleAuthProvider.credential(
-//       accessToken: googleSignInAuthentication.accessToken,
-//       idToken: googleSignInAuthentication.idToken,
-//     );
-//
-//     final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-//     final User? user = userCredential.user;
-//
-//     // Use the user object for further operations or navigate to a new screen.
-//   } catch (e) {
-//     print(e.toString());
-//   }
-// }
-
 // Future<UserCredential>
-signInWithGoogle() async {
-
-  try {
-    // Trigger the authentication flow
-    GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
-    // Obtain the auth details from the request
-
-    GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
-
-    // Create a new credential
-    AuthCredential credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
-    );
-
-    UserCredential user = await FirebaseAuth.instance.signInWithCredential(credential);
-    print('user email: ${user.user?.displayName}');
-    // Once signed in, return the UserCredential
-    // if(user.user != null){
-    //   Get.to(HomeScreen());
-    // }
-    // return await FirebaseAuth.instance.signInWithCredential(credential);
-  } catch (e) {
-    print('Google signin error $e');
-  }
-}
