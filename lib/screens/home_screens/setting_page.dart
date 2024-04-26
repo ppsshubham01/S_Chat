@@ -21,42 +21,13 @@ class _SettingPageState extends State<SettingPage> {
       appBar: AppBar(
         actions: [
           IconButton(
+            tooltip: 'Log Out',
               onPressed: () async {
                 await GoogleSignIn().signOut();
                 FirebaseAuth.instance.signOut();
               },
               icon: const Icon(Icons.logout))
         ],
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            const DrawerHeader(
-                decoration: BoxDecoration(color: Colors.greenAccent),
-                child: Text('settingUserDrawer')),
-            ListTile(
-              title: const Text('Home'),
-              // selected: () {},
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Home 1'),
-              // selected: _selectedIndex,
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Home 2'),
-              // selected: () {},
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
       ),
       body: Container(
         padding: const EdgeInsets.all(22),

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:s_chat/services/auth_services/auth_services.dart';
 import 'firebase_options.dart';
@@ -11,10 +12,9 @@ import 'package:s_chat/theme.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  final appDocumentDire = await getApplicationDocumentsDirectory();
+  Directory  appDocumentDire = await getApplicationDocumentsDirectory();
   // Hive.init(appDocumentDire.path);
   await Hive.initFlutter();
-  // Hive.registerAdapter(adapter);
   await Hive.openBox('notesHiveData');
 
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);

@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:s_chat/res/components/round_Textfield.dart';
 import 'package:s_chat/res/components/round_button.dart';
 import 'package:s_chat/screens/auth_screens/otp_screen.dart';
 import 'package:s_chat/screens/home_screens/home_screens.dart';
@@ -19,6 +21,7 @@ class PhoneAuth extends StatefulWidget {
 class _PhoneAuthState extends State<PhoneAuth> {
   final TextEditingController _phoneController = TextEditingController();
   Rx<User?> savedUser = Rx<User?>(null);
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future registerUser(String mobile, BuildContext context) async {
     FirebaseAuth auth0 = FirebaseAuth.instance;
@@ -100,7 +103,7 @@ class _PhoneAuthState extends State<PhoneAuth> {
       );
 
       UserCredential user =
-      await FirebaseAuth.instance.signInWithCredential(credential);
+          await FirebaseAuth.instance.signInWithCredential(credential);
       savedUser.value = user.user;
 
       print('user name: ${user.user?.displayName}');
@@ -111,41 +114,43 @@ class _PhoneAuthState extends State<PhoneAuth> {
       //   Get.to(HomeScreen());
       // }
       // return await FirebaseAuth.instance.signInWithCredential(credential);
+
+      _firestore.collection('users').doc(user.user?.uid).set({
+        'uid': user.user?.uid,
+        'email': user.user?.email,
+        'photoURL': user.user?.photoURL,
+        'displayName': user.user?.displayName,
+      }, SetOptions(merge: true));
     } catch (e) {
       print('Google signin error $e');
     }
   }
-
-
-  // List<String> googleScopes = <String>[
-  //   'email',
-  //   'https://www.googleapis.com/auth/contacts.readonly',
-  // ];
-  //
-  // GoogleSignIn _googleSignIn = GoogleSignIn(
-  //   // Optional clientId
-  //   // clientId: 'your-client_id.apps.googleusercontent.com',
-  //   scopes: googleScopes,
-  // );
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Login Page'),
+          title: const Text(
+            'S_Chatter ¯_ツ_¯',
+            style: TextStyle(fontSize: 30),
+          ),
         ),
         body: Padding(
           padding: const EdgeInsets.all(18.0),
           child: Form(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                    "Welcome Back Home\n it's Dad's Home..You've been missed!"),
+                  "Welcome Back Home\n it's Dad's Home..You've been missed!",
+                  style: TextStyle(fontSize: 22, color: Colors.black45),
+                ),
                 const SizedBox(
                   height: 15,
                 ),
+                // RoundTextField(onPressed: () {}, controller: _phoneController),
                 TextFormField(
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
@@ -156,8 +161,6 @@ class _PhoneAuthState extends State<PhoneAuth> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: const BorderSide(color: Colors.grey),
                     ),
-                    filled: true,
-                    fillColor: Colors.grey,
                     hintText: 'Enter Phone Number',
                   ),
                   controller: _phoneController,
@@ -185,20 +188,23 @@ class _PhoneAuthState extends State<PhoneAuth> {
                 const SizedBox(
                   height: 10,
                 ),
-                RoundButton(
-                  title: "Get OTP",
-                  onPress: () async {
-                    final mobile = _phoneController.text.trim();
-                    await registerUser(mobile, context);
-                    // Get.toNamed(RouteName.homeScreen);
-                    Get.off(OtpScreen(
-                      verificationID: '',
-                    ));
-                  },
-                  width: 110,
-                  height: 45,
-                  textColor: Colors.white,
-                  buttonColor: Colors.black,
+                Center(
+                  child: RoundButton(
+                    title: "Get OTP",
+                    onPress: () async {
+                      // final mobile = _phoneController.text.trim();
+                      // await registerUser(mobile, context);
+                      // Get.toNamed(RouteName.homeScreen);
+                      Get.to(const HomeScreen());
+                      // Get.off(OtpScreen(
+                      //   verificationID: '',
+                      // ));
+                    },
+                    width: 110,
+                    height: 45,
+                    textColor: Colors.white,
+                    buttonColor: Colors.black,
+                  ),
                 ),
                 const SizedBox(
                   height: 10,
@@ -206,31 +212,22 @@ class _PhoneAuthState extends State<PhoneAuth> {
                 const Divider(
                   thickness: 3,
                 ),
-                IconButton(
-                    onPressed: () {
-                      signInWithGoogle();
-                    },
-                    icon: const Icon(
-                      Icons.g_mobiledata_outlined,
-                      size: 45,
-                    )),
-                const SizedBox(
-                  height: 8,
-                ),
-                const Text(
-                  "Not Member! Register",
-                  style: TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.bold),
+                Center(
+                  child: IconButton(
+                      onPressed: () {
+                        signInWithGoogle();
+                      },
+                      icon: const Icon(
+                        Icons.g_mobiledata_outlined,
+                        size: 65,
+                      )),
                 ),
                 const SizedBox(
                   height: 8,
                 ),
-                InkWell(
-                  onTap: (){
-                    Get.to(const LoginScreen());
-                  },
-                  child: const Text(
-                    "Login Via Email",
+                const Center(
+                  child: Text(
+                    "Made with ❤ by ",
                     style: TextStyle(
                         color: Colors.black, fontWeight: FontWeight.bold),
                   ),

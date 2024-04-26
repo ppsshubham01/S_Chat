@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:s_chat/model/notes_models/noteM.dart';
 import 'package:s_chat/res/components/round_Textfield.dart';
 import 'package:s_chat/screens/notes_screen/notes_editScreen.dart';
@@ -90,7 +89,23 @@ class _NotesPageState extends State<NotesPage> {
                 });
               },
               icon: const Icon(Icons.add)),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              print(value);
+            },
+            itemBuilder: (BuildContext contesxt) {
+              return [
+                PopupMenuItem(
+                  child: Text("View"),
+                  value: "View Gride/List",
+                ),
+                PopupMenuItem(
+                  child: Text("Sync"),
+                  value: "Sync with Google",
+                ),
+              ];
+            },
+          )
         ],
       ),
       body: Padding(
