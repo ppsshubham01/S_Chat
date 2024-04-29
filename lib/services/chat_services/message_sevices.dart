@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:s_chat/model/chats_models/message_model.dart';
 
@@ -10,7 +9,8 @@ class MessageServices extends GetxController {
 
   //send MSG
 
-  Future<void> sendMessage(String receiverId, String message) async {
+  Future<void> sendMessage(
+      String receiverId, String message, String currentName) async {
     // get current user info
     String currentUserID = _firebaseAuth.currentUser!.uid.toString();
     String currentUserEmail = _firebaseAuth.currentUser!.email.toString();
@@ -23,7 +23,8 @@ class MessageServices extends GetxController {
         senderEmail: currentUserEmail,
         receiverID: receiverId,
         message: message,
-        timestamp: timestamp, senderName: currentUserName);
+        timestamp: timestamp,
+        senderName: currentUserName);
 
     // construct chat room id from curren user id and receiver id(sorted to ensure the uniqueness
     List<String> ids = [currentUserID, receiverId];
@@ -40,7 +41,8 @@ class MessageServices extends GetxController {
   }
 
 //get MSG
-  Stream<QuerySnapshot> getMessages(String userId, String otherUserId) {
+  Stream<QuerySnapshot> getMessages(
+      String userId, String otherUserId, String currentName) {
     //construct chatRoomid from user ids(sorted the ids ensure it to matches the id user when sending
 
     List<String> ids = [userId, otherUserId];
@@ -54,4 +56,37 @@ class MessageServices extends GetxController {
         .orderBy('timestamp', descending: false)
         .snapshots();
   }
+
+  // // //delete MSG
+  // Future<void> deleteMessages(
+  //     String userId, String otherUserId, String currentName) {
+  //   //construct chatRoomid from user ids(sorted the ids ensure it to matches the id user when sending
+  //
+  //   List<String> ids = [userId, otherUserId];
+  //   ids.sort();
+  //   String chatroomID = ids.join("_");
+  //
+  //   return _firestore.collection('messages').doc(chatroomID).delete();
+  // }
+Future<void> deleteMessages(String userId, String otherUserId, String currentName) async {
+
+  List<String> ids = [userId, otherUserId];
+  ids.sort();
+  String chatroomID = ids.join("_");
+
+   _firestore
+      .collection('chat_room')
+      .doc(chatroomID)
+      .collection('messages').doc("VbcZXp80y2oYDMQ2iW88").delete().then(
+         (doc) => print("Document deleted"),
+     onError: (e) => print("Error updating document $e"),
+   );
+  // print('messagecollection$messagesCollection');
+  // var snapsots = await messagesCollection.get();
+  // for(var doc in snapsots.docs){
+  //   await doc.reference.delete();
+  // }
+}
+
+
 }

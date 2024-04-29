@@ -28,7 +28,7 @@ class _MessagePageState extends State<MessagePage> {
   void sendMessage() async {
     //only send msg if there is something
     if (_messageController.text.isNotEmpty) {
-      await _messageServices.sendMessage(widget.uid, _messageController.text);
+      await _messageServices.sendMessage(widget.uid, _messageController.text,widget.receiverName);
       _messageController.clear();
     }
   }
@@ -73,6 +73,8 @@ class _MessagePageState extends State<MessagePage> {
               title: const Text("delete"),
               subtitle: const Text("Delete chat from of this account"),
               onTap: () async {
+                _messageServices.deleteMessages(widget.uid, _messageController.text,widget.receiverName);
+                print('curreen UID${widget.uid}');
                 // await _auth.signOut();
                 // Navigator.pushReplacementNamed(context, '/');
               },
@@ -96,7 +98,7 @@ class _MessagePageState extends State<MessagePage> {
   Widget _buildMessageList() {
     return StreamBuilder(
         stream: _messageServices.getMessages(
-            widget.uid, _firebaseAuth.currentUser!.uid),
+            widget.uid, _firebaseAuth.currentUser!.uid,widget.receiverName),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
@@ -117,7 +119,6 @@ class _MessagePageState extends State<MessagePage> {
   // build message item
   Widget _buildMessageItem(DocumentSnapshot documentSnapshot) {
     Map<String, dynamic> data = documentSnapshot.data() as Map<String, dynamic>;
-    //align msg to right if msg is by sender
 
     var alignment = (data['SenderId'] == _firebaseAuth.currentUser!.uid)
         ? Alignment.centerRight
@@ -137,8 +138,10 @@ class _MessagePageState extends State<MessagePage> {
                   ? MainAxisAlignment.end
                   : MainAxisAlignment.start,
           children: [
-            Text(data['SenderEmail']),
-            // Text(data['SenderName']),
+            // Text(data['SenderEmail']),
+            Text(data['SenderName'].split(' ').first ?? 'Unknown'), //isuuue on Name display
+
+            // Text(data['SenderName'].split(' ').first),
             // Text(data['message']),
             ChatMessageBox(message: data['message']),
           ],
@@ -149,22 +152,25 @@ class _MessagePageState extends State<MessagePage> {
 
   //build message input
   Widget _buildMessageInput() {
-    return Row(
-      children: [
-        Expanded(
-            child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: RoundTextField(
-            textbackgroundColor: Colors.transparent,
-            onPressed: () {},
-            controller: _messageController,
-            hintText: 'Enter Message',
-            obscureText: false,
-          ),
-        )),
-        IconButton(
-            onPressed: sendMessage, icon: const Icon(Icons.arrow_upward_sharp))
-      ],
+    return Container(
+      color: Colors.greenAccent,
+      child: Row(
+        children: [
+          Expanded(
+              child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: RoundTextField(
+              textbackgroundColor: Colors.transparent,
+              onPressed: () {},
+              controller: _messageController,
+              hintText: 'Enter Message',
+              obscureText: false,
+            ),
+          )),
+          IconButton(
+              onPressed: sendMessage, icon: const Icon(Icons.arrow_upward_sharp))
+        ],
+      ),
     );
   }
 }

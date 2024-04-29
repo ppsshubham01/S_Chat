@@ -1,7 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:s_chat/model/notes_models/noteM.dart';
-import 'package:s_chat/screens/home_screens/notes_page.dart';
 
 class NotesEditScreen extends StatefulWidget {
   final NotesModel? notesModel;
@@ -14,9 +13,11 @@ class NotesEditScreen extends StatefulWidget {
 }
 
 class _NotesEditScreenState extends State<NotesEditScreen> {
-  late TextEditingController titleController = TextEditingController();
-  late TextEditingController contentController = TextEditingController();
+   TextEditingController titleController = TextEditingController();
+   TextEditingController contentController = TextEditingController();
   DateTime _lastEditText = DateTime.now();
+
+  CollectionReference ref = FirebaseFirestore.instance.collection('notes');
 
   void _addressControllerListener() {
     print(titleController.text);
@@ -26,11 +27,12 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
     // HiveNotesModel saveNotes = HiveNotesModel(id: DateTime.now().toString(), title: titleController.text, content: contentController.text);
     // setState(() { });
     if (titleController.text.isNotEmpty && contentController.text.isNotEmpty) {
-      final note = NotesModel(
-          title: titleController.text, content: contentController.text);
+      // final note = NotesModel(
+      //     // title: titleController.text, content: contentController.text
+      // );
       // widget.onSave(note);
       // Get.off(()=> NotesPage());
-      Navigator.pop(context, note);
+      // Navigator.pop(context, note);
     }
     titleController.clear();
     contentController.clear();
@@ -51,10 +53,10 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
     super.initState();
     titleController =
         TextEditingController(text: widget.notesModel?.title ?? '');
-    contentController =
-        TextEditingController(text: widget.notesModel?.content ?? '');
+    // contentController =
+        // TextEditingController(text: widget.notesModel?.content ?? '');
 
-    contentController.addListener(onTextChange);
+    // contentController.addListener(onTextChange);
   }
 
   @override
@@ -100,7 +102,14 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
                 tooltip: 'Edit title Name',
               ),
               IconButton(
-                onPressed: saveNotes,
+                onPressed: (){
+                  saveNotes();
+                  ref.add({
+                    'title': titleController.text,
+                    'content': contentController.text,
+                  }).whenComplete(() => Navigator.pop(context));
+
+                },
                 icon: const Icon(Icons.save),
                 tooltip: 'More Option',
               ),
