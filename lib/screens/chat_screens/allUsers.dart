@@ -3,16 +3,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:s_chat/res/components/round_Textfield.dart';
+
 import 'messages_page.dart';
 
-class Conversations extends StatefulWidget {
-  const Conversations({super.key});
+class AllUsers extends StatefulWidget {
+  const AllUsers({super.key});
 
   @override
-  State<Conversations> createState() => _ConversationsState();
+  State<AllUsers> createState() => _AllUsersState();
 }
 
-class _ConversationsState extends State<Conversations> {
+class _AllUsersState extends State<AllUsers> {
   final TextEditingController searchingChatController = TextEditingController();
   List searchItems = [];
   List<DocumentSnapshot> filteredUsers = [];
@@ -86,13 +87,6 @@ class _ConversationsState extends State<Conversations> {
           }
 
           if (snapshots.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: SizedBox(
-                height: 50.0,
-                width: 50.0,
-                child: CircularProgressIndicator(),
-              ),
-            );
             return const Center(child: Text('Loading'));
           }
 

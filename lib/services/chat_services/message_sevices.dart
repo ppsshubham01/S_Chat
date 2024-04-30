@@ -7,8 +7,6 @@ class MessageServices extends GetxController {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  //send MSG
-
   Future<void> sendMessage(
       String receiverId, String message, String currentName) async {
     // get current user info
@@ -26,11 +24,10 @@ class MessageServices extends GetxController {
         timestamp: timestamp,
         senderName: currentUserName);
 
-    // construct chat room id from curren user id and receiver id(sorted to ensure the uniqueness
+    // construct chat room id from current user id and receiver id(sorted to ensure the uniqueness
     List<String> ids = [currentUserID, receiverId];
     ids.sort(); // sort the ids  (this is for chat room id are same for everyOne  for any pair of people
-    String chatRoomId =
-        ids.join('_'); // combin the ids in single line to identify
+    String chatRoomId = ids.join('_');
 
     // add new Message to DataBase
     await _firestore
@@ -43,8 +40,6 @@ class MessageServices extends GetxController {
 //get MSG
   Stream<QuerySnapshot> getMessages(
       String userId, String otherUserId, String currentName) {
-    //construct chatRoomid from user ids(sorted the ids ensure it to matches the id user when sending
-
     List<String> ids = [userId, otherUserId];
     ids.sort();
     String chatroomID = ids.join("_");
@@ -57,36 +52,29 @@ class MessageServices extends GetxController {
         .snapshots();
   }
 
-  // // //delete MSG
-  // Future<void> deleteMessages(
-  //     String userId, String otherUserId, String currentName) {
-  //   //construct chatRoomid from user ids(sorted the ids ensure it to matches the id user when sending
-  //
-  //   List<String> ids = [userId, otherUserId];
-  //   ids.sort();
-  //   String chatroomID = ids.join("_");
-  //
-  //   return _firestore.collection('messages').doc(chatroomID).delete();
-  // }
-Future<void> deleteMessages(String userId, String otherUserId, String currentName) async {
+  Future<void> deleteMessages(
+      String userId, String otherUserId, String currentName) async {
+    try {
+      List<String> ids = [userId, otherUserId];
+      ids.sort();
+      print("ids: ${ids}");
+      String chatroomID = ids.join("_");
+      print('chatRoomID ${chatroomID}');
 
-  List<String> ids = [userId, otherUserId];
-  ids.sort();
-  String chatroomID = ids.join("_");
-
-   _firestore
-      .collection('chat_room')
-      .doc(chatroomID)
-      .collection('messages').doc("VbcZXp80y2oYDMQ2iW88").delete().then(
-         (doc) => print("Document deleted"),
-     onError: (e) => print("Error updating document $e"),
-   );
-  // print('messagecollection$messagesCollection');
-  // var snapsots = await messagesCollection.get();
-  // for(var doc in snapsots.docs){
-  //   await doc.reference.delete();
-  // }
-}
-
-
+      await _firestore.collection('chat_room').doc(chatroomID).delete();
+    } catch (error) {
+      print(error.toString());
+    }
+    // .snapshots().map((event) => print('eventsnaData : ${event.data.toString()}'));
+    //  .collection('messages').doc().delete()
+    //   .then(
+    //     (doc) => print("Document deleted"),
+    // onError: (e) => print("Error updating document $e"),
+    //  // );
+    // print('messagecollection${messagesCollection}');
+    // dynamic snapsots = await messagesCollection.get();
+    // for(var doc in snapsots.docs){
+    //   await doc.reference.delete();
+    // }
+  }
 }

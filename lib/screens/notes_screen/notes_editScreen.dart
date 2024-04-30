@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:s_chat/model/notes_models/noteM.dart';
+import 'package:s_chat/services/note_services/notes_services.dart';
 
 class NotesEditScreen extends StatefulWidget {
   final NotesModel? notesModel;
@@ -13,11 +15,12 @@ class NotesEditScreen extends StatefulWidget {
 }
 
 class _NotesEditScreenState extends State<NotesEditScreen> {
-   TextEditingController titleController = TextEditingController();
-   TextEditingController contentController = TextEditingController();
+  TextEditingController titleController = TextEditingController();
+  TextEditingController contentController = TextEditingController();
   DateTime _lastEditText = DateTime.now();
 
   CollectionReference ref = FirebaseFirestore.instance.collection('notes');
+  final NotesServices _notesServices = NotesServices();
 
   void _addressControllerListener() {
     print(titleController.text);
@@ -53,9 +56,7 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
     super.initState();
     titleController =
         TextEditingController(text: widget.notesModel?.title ?? '');
-    // contentController =
-        // TextEditingController(text: widget.notesModel?.content ?? '');
-
+    // contentController = TextEditingController(text: widget.notesModel?.content ?? '');
     // contentController.addListener(onTextChange);
   }
 
@@ -102,13 +103,18 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
                 tooltip: 'Edit title Name',
               ),
               IconButton(
-                onPressed: (){
-                  saveNotes();
-                  ref.add({
-                    'title': titleController.text,
-                    'content': contentController.text,
-                  }).whenComplete(() => Navigator.pop(context));
-
+                onPressed: () {
+                  // saveNotes();
+                  _notesServices.saveNotesToFireStore(
+                      'id', titleController.text, contentController.text);
+                  Get.back();
+                  // ref.add({
+                  //   'title': titleController.text,
+                  //   'content': contentController.text,
+                  // }).whenComplete(() {
+                  //   Navigator.pop(context);
+                  //   saveNotes();
+                  // });
                 },
                 icon: const Icon(Icons.save),
                 tooltip: 'More Option',

@@ -13,9 +13,11 @@ import 'model/notes_models/noteM.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  Directory  appDocumentDire = await getApplicationDocumentsDirectory();
+  Directory appDocumentDire = await getApplicationDocumentsDirectory();
   // Hive.init(appDocumentDire.path);
-  Hive..init(appDocumentDire.path)..registerAdapter(NotesModelAdapter());
+  Hive
+    ..init(appDocumentDire.path)
+    ..registerAdapter(NotesModelAdapter());
   await Hive.initFlutter();
   await Hive.openBox('noteBox');
 
@@ -31,10 +33,16 @@ void main() async {
   ));
 }
 
-class MyApp extends StatelessWidget {
-  MyApp({super.key, required this.appTheme});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key, required this.appTheme});
 
   final AppTheme appTheme;
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   bool isDark = false;
 
   @override

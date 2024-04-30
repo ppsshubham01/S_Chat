@@ -14,7 +14,11 @@ class MessagePage extends StatefulWidget {
   final String uid;
 
   const MessagePage(
-      {super.key, required this.receiverEmail, required this.uid, required this.receiverName, required this.photoURL});
+      {super.key,
+      required this.receiverEmail,
+      required this.uid,
+      required this.receiverName,
+      required this.photoURL});
 
   @override
   State<MessagePage> createState() => _MessagePageState();
@@ -28,7 +32,8 @@ class _MessagePageState extends State<MessagePage> {
   void sendMessage() async {
     //only send msg if there is something
     if (_messageController.text.isNotEmpty) {
-      await _messageServices.sendMessage(widget.uid, _messageController.text,widget.receiverName);
+      await _messageServices.sendMessage(
+          widget.uid, _messageController.text, widget.receiverName);
       _messageController.clear();
     }
   }
@@ -49,7 +54,8 @@ class _MessagePageState extends State<MessagePage> {
                 icon: const Icon(Icons.exit_to_app_outlined),
                 onPressed: () {
                   exit(0);
-                },tooltip: 'Exit App',
+                },
+                tooltip: 'Exit App',
               ),
             ),
           ]),
@@ -61,10 +67,9 @@ class _MessagePageState extends State<MessagePage> {
                 color: Colors.deepPurple[900],
               ),
               accountName: Text(widget.receiverName),
-              accountEmail:  Text(widget.receiverEmail),
+              accountEmail: Text(widget.receiverEmail),
               currentAccountPicture: CircleAvatar(
-                backgroundImage:
-                    NetworkImage(widget.photoURL),
+                backgroundImage: NetworkImage(widget.photoURL),
               ),
               onDetailsPressed: () {},
             ),
@@ -73,10 +78,8 @@ class _MessagePageState extends State<MessagePage> {
               title: const Text("delete"),
               subtitle: const Text("Delete chat from of this account"),
               onTap: () async {
-                _messageServices.deleteMessages(widget.uid, _messageController.text,widget.receiverName);
-                print('curreen UID${widget.uid}');
-                // await _auth.signOut();
-                // Navigator.pushReplacementNamed(context, '/');
+                _messageServices.deleteMessages(widget.uid,
+                    _firebaseAuth.currentUser!.uid, widget.receiverName);
               },
             ),
           ],
@@ -98,7 +101,7 @@ class _MessagePageState extends State<MessagePage> {
   Widget _buildMessageList() {
     return StreamBuilder(
         stream: _messageServices.getMessages(
-            widget.uid, _firebaseAuth.currentUser!.uid,widget.receiverName),
+            widget.uid, _firebaseAuth.currentUser!.uid, widget.receiverName),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
@@ -139,7 +142,8 @@ class _MessagePageState extends State<MessagePage> {
                   : MainAxisAlignment.start,
           children: [
             // Text(data['SenderEmail']),
-            Text(data['SenderName'].split(' ').first ?? 'Unknown'), //isuuue on Name display
+            Text(data['SenderName'].split(' ').first ??
+                'Unknown'), //isuuue on Name display
 
             // Text(data['SenderName'].split(' ').first),
             // Text(data['message']),
@@ -168,7 +172,8 @@ class _MessagePageState extends State<MessagePage> {
             ),
           )),
           IconButton(
-              onPressed: sendMessage, icon: const Icon(Icons.arrow_upward_sharp))
+              onPressed: sendMessage,
+              icon: const Icon(Icons.arrow_upward_sharp))
         ],
       ),
     );

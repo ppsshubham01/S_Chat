@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:s_chat/model/notes_models/noteM.dart';
@@ -7,7 +9,8 @@ import 'package:s_chat/services/hiveDb/database.dart';
 
 class NotesPage extends StatefulWidget {
   final NotesModel? notesModel;
-  const NotesPage({super.key,this.notesModel});
+
+  const NotesPage({super.key, this.notesModel});
 
   @override
   State<NotesPage> createState() => _NotesPageState();
@@ -20,6 +23,10 @@ class _NotesPageState extends State<NotesPage> {
   ];
 
   HiveHelperDB hiveHelperDB = HiveHelperDB();
+  final ref = FirebaseFirestore.instance
+      .collection('notesNoted')
+      .doc(FirebaseAuth.instance.currentUser!.uid)
+      .collection('nts');
 
   // NotesModel notesModelss = NotesModel(title: 'title', content: 'content');
   final TextEditingController searchController = TextEditingController();
@@ -95,7 +102,7 @@ class _NotesPageState extends State<NotesPage> {
             onSelected: (value) {
               print(value);
             },
-            itemBuilder: (BuildContext contesxt) {
+            itemBuilder: (BuildContext context) {
               return [
                 const PopupMenuItem(
                   value: "View Gride/List",
@@ -144,82 +151,100 @@ class _NotesPageState extends State<NotesPage> {
             //   );
             // }),
             Flexible(
-              child: ListView.builder(
-                  itemCount: notesOfList.length,
-                  itemBuilder: (context, index) {
-                    final note = notesOfList[index];
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ListTile(
-                        title: Text(
-                          notesOfList[index].title,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        subtitle: Text(
-                          // notesOfList[index].content.split('\n').first,
-                          // overflow: TextOverflow.ellipsis,
-                          ""
-                        ),
-                        shape: RoundedRectangleBorder(
-                            side:
-                                const BorderSide(color: Colors.black, width: 1),
-                            borderRadius: BorderRadius.circular(10)),
-                        onTap: () async {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => NotesEditScreen(
-                                      notesModel: note,
-                                      onSave: addOrEditNote)));
-                        },
-                        trailing: IconButton(
-                            onPressed: () {
-                              showDialog<String>(
-                                context: context,
-                                builder: (BuildContext context) => AlertDialog(
-                                  title: const Text(
-                                    'Delete?',
-                                    style: TextStyle(color: Colors.redAccent),
-                                  ),
-                                  content: const Text(
-                                      'sure you want to delete this note!'),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, 'Cancel'),
-                                      child: const Text('Cancel'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Get.defaultDialog(
-                                          title: "Delete this Note ?",
-                                          middleText: "",
-                                          textConfirm: "Delete",
-                                          textCancel: "Cancel",
-                                          cancelTextColor: Colors.pinkAccent,
-                                          confirmTextColor: Colors.black,
-                                          onConfirm: (){
-                                            widget.notesModel?.delete();
-                                            Get.back();
-                                          },
-                                        );
-                                      },
-                                      child: const Text(
-                                        'YES',
-                                        style: TextStyle(color: Colors.red),
+              child: StreamBuilder(
+                stream: ref.snapshots(),
+                builder: (context, AsyncSnapshot<QuerySnapshot> snapshots) {
+                  return SingleChildScrollView(
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        // itemCount: notesOfList.length,
+                        itemCount:
+                            snapshots.hasData ? snapshots.data?.docs.length : 0,
+                        itemBuilder: (_, index) {
+                          final notes = snapshots.data?.docs[index];
+                          // final note = notesOfList[index];
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ListTile(
+                              title: Text(
+                                // notesOfList[index].title,
+                                notes?['title'],
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              subtitle: Text(
+                                notes?['content'],
+                                maxLines: 1,
+                                // notesOfList[index].content.split('\n').first,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                  side: const BorderSide(
+                                      color: Colors.black, width: 1),
+                                  borderRadius: BorderRadius.circular(10)),
+                              onTap: () async {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => NotesEditScreen(
+                                            // notesModel: notes,
+                                            onSave: addOrEditNote)));
+                              },
+                              trailing: IconButton(
+                                  onPressed: () {
+                                    showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) =>
+                                          AlertDialog(
+                                        title: const Text(
+                                          'Delete?',
+                                          style: TextStyle(
+                                              color: Colors.redAccent),
+                                        ),
+                                        content: const Text(
+                                            'sure you want to delete this note!'),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(
+                                                context, 'Cancel'),
+                                            child: const Text('Cancel'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Get.defaultDialog(
+                                                title: "Delete this Note ?",
+                                                middleText: "",
+                                                textConfirm: "Delete",
+                                                textCancel: "Cancel",
+                                                cancelTextColor:
+                                                    Colors.pinkAccent,
+                                                confirmTextColor: Colors.black,
+                                                onConfirm: () {
+                                                  widget.notesModel?.delete();
+                                                  Get.back();
+                                                },
+                                              );
+                                            },
+                                            child: const Text(
+                                              'YES',
+                                              style:
+                                                  TextStyle(color: Colors.red),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            icon: Icon(
-                              Icons.delete,
-                              color: Colors.red,
-                            )),
-                      ),
-                    );
-                  }),
+                                    );
+                                  },
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  )),
+                            ),
+                          );
+                        }),
+                  );
+                },
+              ),
             ),
           ],
         ),

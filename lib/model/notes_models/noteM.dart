@@ -7,9 +7,7 @@ import '../../services/hiveDb/database.dart';
 part 'noteM.g.dart';
 
 @HiveType(typeId: 0)
-class NotesModel extends HiveObject{
-
-
+class NotesModel extends HiveObject {
   @HiveField(0)
   int id;
 
@@ -19,9 +17,13 @@ class NotesModel extends HiveObject{
   @HiveField(2)
   String description;
 
-  NotesModel({required this.id,required this.title,required this.description, });
+  NotesModel({
+    required this.id,
+    required this.title,
+    required this.description,
+  });
 
-  add(){
+  add() {
     final NoteController noteController = Get.find();
     List notes = noteController.notes;
     notes.add(this);
@@ -39,7 +41,7 @@ class NotesModel extends HiveObject{
     Get.snackbar("Delete", "Success", snackPosition: SnackPosition.BOTTOM);
   }
 
-  edit(String title, String description){
+  edit(String title, String description) {
     this.title = title;
     this.description = description;
     final NoteController noteController = Get.put(NoteController());
@@ -49,19 +51,4 @@ class NotesModel extends HiveObject{
     // Get.off(() => ViewNoteScreen(note: this));
     Get.snackbar("Edit", "Success", snackPosition: SnackPosition.BOTTOM);
   }
-
-// }
-//
-// @HiveType(typeId: 1)
-// class HiveNotesModel {
-//   @HiveField(0)
-//   String id;
-//
-//   @HiveField(1)
-//   String title;
-//
-//   @HiveField(2)
-//   String content;
-//
-//   HiveNotesModel({required this.id,required this.title, required this.content});
 }
