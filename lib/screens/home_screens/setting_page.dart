@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:s_chat/res/permission/permissions.dart';
 
 class SettingPage extends StatefulWidget {
   final User? user;

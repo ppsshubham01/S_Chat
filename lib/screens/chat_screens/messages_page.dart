@@ -1,10 +1,14 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:s_chat/res/components/chatMessage_box.dart';
 import 'package:s_chat/res/components/round_Textfield.dart';
+import 'package:s_chat/res/permission/permissions.dart';
 import 'package:s_chat/services/chat_services/message_sevices.dart';
 
 class MessagePage extends StatefulWidget {
@@ -28,9 +32,10 @@ class _MessagePageState extends State<MessagePage> {
   final TextEditingController _messageController = TextEditingController();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final MessageServices _messageServices = MessageServices();
+  File? galleryFile;
+  final picker = ImagePicker();
 
   void sendMessage() async {
-    //only send msg if there is something
     if (_messageController.text.isNotEmpty) {
       await _messageServices.sendMessage(
           widget.uid, _messageController.text, widget.receiverName);
@@ -145,8 +150,6 @@ class _MessagePageState extends State<MessagePage> {
             Text(data['SenderName'].split(' ').first ??
                 'Unknown'), //isuuue on Name display
 
-            // Text(data['SenderName'].split(' ').first),
-            // Text(data['message']),
             ChatMessageBox(message: data['message']),
           ],
         ),
@@ -172,10 +175,91 @@ class _MessagePageState extends State<MessagePage> {
             ),
           )),
           IconButton(
+              onPressed: () {
+                // PermissionHandling().requestPermission();
+                _showPicker(context: context);
+              },
+              icon: const Icon(Icons.camera_alt_outlined)),
+          IconButton(
               onPressed: sendMessage,
               icon: const Icon(Icons.arrow_upward_sharp))
         ],
       ),
+    );
+  }
+
+  void _showPicker({
+    required BuildContext context,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Photo Library'),
+                onTap: () {
+                  getImage(ImageSource.gallery);
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_camera),
+                title: const Text('Camera'),
+                onTap: () async {
+                  Permission cameraPermission = Permission.camera;
+
+                  print(
+                      'cameraPermission: ${cameraPermission.status.toString()}');
+                  inspect(cameraPermission.status.toString());
+                  if (await cameraPermission.isDenied) {
+                    final result = await cameraPermission.request();
+                    print("result $result");
+
+                    if (result.isGranted) {
+                      getImage(ImageSource.camera);
+                    } else if (result.isDenied) {
+                      openAppSettings();
+                    } else if (result.isPermanentlyDenied) {
+                      // openAppSettings();
+                      // ScaffoldMessenger.of(context).showSnackBar(// is this context <<<
+                      //     const SnackBar(content: Text('permission is selected')));
+                    }
+                  } else {
+                    openAppSettings();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        // is this context <<<
+                        const SnackBar(
+                            content: Text('Grant Camera Permission!')));
+                  }
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future getImage(
+    ImageSource img,
+  ) async {
+    final pickedFile = await picker.pickImage(source: img);
+    XFile? xfilePick = pickedFile;
+    setState(
+      () {
+        if (xfilePick != null) {
+          galleryFile = File(pickedFile!.path);
+          ScaffoldMessenger.of(context).showSnackBar(// is this context <<<
+              const SnackBar(content: Text('Is selected')));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(// is this context <<<
+              const SnackBar(content: Text('Nothing is selected')));
+        }
+      },
     );
   }
 }

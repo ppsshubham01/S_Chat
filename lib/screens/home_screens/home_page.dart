@@ -1,8 +1,13 @@
+import 'dart:io';
+
+import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crop_image/crop_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:s_chat/screens/chat_screens/allUsers.dart';
+import 'package:s_chat/screens/home_screens/home_screens.dart';
 
 import '../chat_screens/messages_page.dart';
 
@@ -16,19 +21,49 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController searchingChatController = TextEditingController();
   bool isDark = false;
+  CameraDescription? firstCamera;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
 
   @override
   void initState() {
-    // TODO: implement initState
+    initializePage();
     super.initState();
+  }
+
+  initializePage() async {
     userConversation();
+    userConversation();
+    initCamera();
+  }
+
+  initCamera() async {
+    print('abcdef');
+    final cameras = await availableCameras();
+    print('camear : $cameras');
+    setState(() {
+      firstCamera = cameras.first;
+    });
+  }
+
+  navigateToTakePictureScreen(BuildContext context) {
+    print('firstCamera $firstCamera');
+    if (firstCamera != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TakePictureScreen(camera: firstCamera!),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('errror Camera is not availble')));
+    }
   }
 
   userConversation() {
-    var conversation = _firestore.collection('chat_room').doc();
+    var conversation = _fireStore.collection('chat_room').doc();
     if (conversation.id.isNotEmpty) {
       return conversation.snapshots().length;
     }
@@ -36,6 +71,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // final camera = await availableCameras();
+    // final firstCamera = camera.first;
     final ThemeData themeData = ThemeData(
         useMaterial3: true,
         brightness: isDark ? Brightness.dark : Brightness.light);
@@ -55,7 +92,14 @@ class _HomePageState extends State<HomePage> {
           title: const Text(' ¯_ツ_¯'),
           actions: [
             IconButton(
-                onPressed: () {}, icon: const Icon(Icons.camera_alt_outlined)),
+                onPressed: () {
+                  // TakePictureScreen(
+                  //   camera: firstCamera!,
+                  // );
+                  navigateToTakePictureScreen(context);
+                  // PermissionHandling().getFromGallery(context);
+                },
+                icon: const Icon(Icons.camera_alt_outlined)),
             IconButton(onPressed: () {}, icon: const Icon(Icons.notifications)),
             // IconButton(
             //     onPressed: () {}, icon: const Icon(Icons.more_vert_outlined))
@@ -156,8 +200,8 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: Colors.white12,
           elevation: 0,
           onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const AllUsers()));
+            Navigator.push(
+                context, MaterialPageRoute(builder: (_) => const AllUsers()));
           },
           child: const Icon(Icons.contact_page_outlined),
           // child: IconBackground(icon: Icons.contact_page_outlined, onTap: () {}),
@@ -168,6 +212,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildUserList() {
     final ref = FirebaseFirestore.instance.collection('chat_room').doc();
+
     return StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('users').snapshots(),
         // stream: ref.snapshots(),
@@ -185,39 +230,296 @@ class _HomePageState extends State<HomePage> {
             child: ListView(
               shrinkWrap: true,
               children: snapshots.data!.docs
-                  .map<Widget>((doc) => _buildUserListItem(doc))
+                  .map<Widget>((doc) => snapshots.data!.docs.length == 0
+                      ? Center(child: Text("Empty Chat List Data1111"))
+                      : _buildUserListItem(doc))
                   .toList(),
             ),
           );
         });
   }
 
-  Widget _buildUserListItem(DocumentSnapshot documentSnapshot) {
-    Map<String, dynamic> data = documentSnapshot.data()! as Map<String, dynamic>;
-    if (_auth.currentUser!.email != data['email']) {
-      return Container(
-        margin: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-            color: Colors.redAccent, borderRadius: BorderRadius.circular(22)),
-        child: ListTile(
-          leading: CircleAvatar(
-            backgroundImage: NetworkImage(
-                data['photoURL'] ?? 'https://source.unsplash.com/random'),
-          ),
-          title: Text(data['displayName']), //photoURL
-          onTap: () {
-            Get.to(MessagePage(
-              receiverEmail: data['email'],
-              uid: data['uid'],
-              receiverName: data['displayName'],
-              photoURL: data['photoURL'],
-            ));
-          },
-        ),
+  _buildUserListItem(DocumentSnapshot documentSnapshot) {
+    Map<String, dynamic> data =
+        documentSnapshot.data()! as Map<String, dynamic>;
+    return (_auth.currentUser!.email != data['email'])
+        ? Container(
+            margin: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+                color: Colors.redAccent,
+                borderRadius: BorderRadius.circular(22)),
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundImage: NetworkImage(
+                    data['photoURL'] ?? 'https://source.unsplash.com/random'),
+              ),
+              title: Text(data['displayName']), //photoURL
+              onTap: () {
+                Get.to(MessagePage(
+                  receiverEmail: data['email'],
+                  uid: data['uid'],
+                  receiverName: data['displayName'],
+                  photoURL: data['photoURL'],
+                ));
+              },
+            ))
+        : const SizedBox();
+  }
+}
+
+/// Mutltiple Camera acces for global use of that
+///
+
+// A screen that allows users to take a picture using a given camera.
+
+Future<void> main() async {
+  // Ensure that plugin services are initialized so that `availableCameras()`
+  // can be called before `runApp()`
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Obtain a list of the available cameras on the device.
+  final cameras = await availableCameras();
+
+  // Get a specific camera from the list of available cameras.
+  final firstCamera = cameras.first;
+
+  runApp(
+    MaterialApp(
+      theme: ThemeData.dark(),
+      home: TakePictureScreen(
+        // Pass the appropriate camera to the TakePictureScreen widget.
+        camera: firstCamera,
+      ),
+    ),
+  );
+}
+
+// A screen that allows users to take a picture using a given camera.
+class TakePictureScreen extends StatefulWidget {
+  const TakePictureScreen({
+    super.key,
+    required this.camera,
+  });
+
+  final CameraDescription camera;
+
+  @override
+  TakePictureScreenState createState() => TakePictureScreenState();
+}
+
+class TakePictureScreenState extends State<TakePictureScreen> {
+  late CameraController _controller;
+  late Future<void> _initializeControllerFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    // To display the current output from the Camera,
+    // create a CameraController.
+    _controller = CameraController(
+      // Get a specific camera from the list of available cameras.
+      widget.camera,
+      // Define the resolution to use.
+      ResolutionPreset.medium,
+    );
+
+    // Next, initialize the controller. This returns a Future.
+    _initializeControllerFuture = _controller.initialize();
+  }
+
+  @override
+  void dispose() {
+    // Dispose of the controller when the widget is disposed.
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Take a picture')),
+      // You must wait until the controller is initialized before displaying the
+      // camera preview. Use a FutureBuilder to display a loading spinner until the
+      // controller has finished initializing.
+      body: FutureBuilder<void>(
+        future: _initializeControllerFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            // If the Future is complete, display the preview.
+            return CameraPreview(_controller);
+          } else {
+            // Otherwise, display a loading indicator.
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        // Provide an onPressed callback.
+        onPressed: () async {
+          // Take the Picture in a try / catch block. If anything goes wrong,
+          // catch the error.
+          try {
+            // Ensure that the camera is initialized.
+            await _initializeControllerFuture;
+
+            // Attempt to take a picture and get the file `image`
+            // where it was saved.
+            final image = await _controller.takePicture();
+
+            if (!context.mounted) return;
+
+            // If the picture was taken, display it on a new screen.
+            await Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => DisplayPictureScreen(
+                  imagePath: image.path,
+                ),
+              ),
+            );
+          } catch (e) {
+            print(e);
+          }
+        },
+        child: const Icon(Icons.camera_alt),
+      ),
+    );
+  }
+}
+
+// A widget that displays the picture taken by the user.
+class DisplayPictureScreen extends StatelessWidget {
+  final String imagePath;
+
+  DisplayPictureScreen({super.key, required this.imagePath});
+
+  final cropController = CropController(
+    aspectRatio: 0.7,
+    defaultCrop: const Rect.fromLTRB(0.1, 0.1, 0.9, 0.9),
+  );
+
+  Future cropImage() async {}
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: const Text('Display the Picture')),
+        // The image is stored as a file on the device. Use the `Image.file`
+        // constructor with the given path to display the image.
+        body: CropImage(
+            controller: cropController,
+            paddingSize: 25.0,
+            alwaysMove: true,
+            minimumImageSize: 500,
+            maximumImageSize: 500,
+            image: Image.file(File(imagePath))),
+
+        bottomNavigationBar: _buildButtons(context),
       );
+
+  _buildButtons(BuildContext context) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () {
+              cropController.rotation = CropRotation.up;
+              cropController.crop = const Rect.fromLTRB(0.1, 0.1, 0.9, 0.9);
+              cropController.aspectRatio = 1.0;
+              Get.back();
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.aspect_ratio),
+            onPressed: () {
+              _aspectRatios(context);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.rotate_90_degrees_ccw_outlined),
+            onPressed: _rotateLeft,
+          ),
+          IconButton(
+            icon: const Icon(Icons.rotate_90_degrees_cw_outlined),
+            onPressed: _rotateRight,
+          ),
+          TextButton(
+            onPressed: () {
+              _finished(context);
+            },
+            child: const Text('Done'),
+          ),
+        ],
+      );
+
+  _aspectRatios(BuildContext context) async {
+    final value = await showDialog<double>(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          title: const Text('Select aspect ratio'),
+          children: [
+            // special case: no aspect ratio
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(context, -1.0),
+              child: const Text('free'),
+            ),
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(context, 1.0),
+              child: const Text('square'),
+            ),
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(context, 2.0),
+              child: const Text('2:1'),
+            ),
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(context, 1 / 2),
+              child: const Text('1:2'),
+            ),
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(context, 4.0 / 3.0),
+              child: const Text('4:3'),
+            ),
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(context, 16.0 / 9.0),
+              child: const Text('16:9'),
+            ),
+          ],
+        );
+      },
+    );
+    if (value != null) {
+      cropController.aspectRatio = value == -1 ? null : value;
+      cropController.crop = const Rect.fromLTRB(0.1, 0.1, 0.9, 0.9);
     }
-    return const Center(child: Text("Empty Chat List Data"));
-    return Container();
+  }
+
+  _rotateLeft() async => cropController.rotateLeft();
+
+  _rotateRight() async => cropController.rotateRight();
+
+  _finished(BuildContext context) async {
+    final image = await cropController.croppedImage();
+    await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          contentPadding: const EdgeInsets.all(6.0),
+          titlePadding: const EdgeInsets.all(8.0),
+          title: const Text('Cropped image'),
+          children: [
+            Text('relative: ${cropController.crop}'),
+            Text('pixels: ${cropController.cropSize}'),
+            const SizedBox(height: 5),
+            image,
+            TextButton(
+              onPressed: () => Navigator.pushAndRemoveUntil(
+                  context, MaterialPageRoute(builder: (_) => const HomeScreen()), (route) {return false;} ),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
