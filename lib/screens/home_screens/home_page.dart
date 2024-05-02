@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:s_chat/screens/chat_screens/allUsers.dart';
+import 'package:s_chat/screens/chat_screens/notification_page.dart';
 import 'package:s_chat/screens/home_screens/home_screens.dart';
 
 import '../chat_screens/messages_page.dart';
@@ -33,7 +34,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   initializePage() async {
-    userConversation();
     userConversation();
     initCamera();
   }
@@ -100,7 +100,7 @@ class _HomePageState extends State<HomePage> {
                   // PermissionHandling().getFromGallery(context);
                 },
                 icon: const Icon(Icons.camera_alt_outlined)),
-            IconButton(onPressed: () {}, icon: const Icon(Icons.notifications)),
+            IconButton(onPressed: () {Get.to(NotificationPage());}, icon: const Icon(Icons.notifications)),
             // IconButton(
             //     onPressed: () {}, icon: const Icon(Icons.more_vert_outlined))
             PopupMenuButton<String>(
@@ -272,27 +272,6 @@ class _HomePageState extends State<HomePage> {
 
 // A screen that allows users to take a picture using a given camera.
 
-Future<void> main() async {
-  // Ensure that plugin services are initialized so that `availableCameras()`
-  // can be called before `runApp()`
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Obtain a list of the available cameras on the device.
-  final cameras = await availableCameras();
-
-  // Get a specific camera from the list of available cameras.
-  final firstCamera = cameras.first;
-
-  runApp(
-    MaterialApp(
-      theme: ThemeData.dark(),
-      home: TakePictureScreen(
-        // Pass the appropriate camera to the TakePictureScreen widget.
-        camera: firstCamera,
-      ),
-    ),
-  );
-}
 
 // A screen that allows users to take a picture using a given camera.
 class TakePictureScreen extends StatefulWidget {
