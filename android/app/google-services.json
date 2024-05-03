@@ -37,6 +37,13 @@
             {
               "client_id": "252105781057-7pcmfd5l8lc2p1lfkp12ueje5f57p7uu.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "252105781057-2rstpvp0p4bqlp2vikjsnimt53pm8bvq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.sChat"
+              }
             }
           ]
         }
@@ -59,14 +66,6 @@
           }
         },
         {
-          "client_id": "252105781057-kpv0c23djlkla5ik0iqob9rgm0ri5kk8.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.s_chat",
-            "certificate_hash": "985a65ea0344c17cfbdeb5cd64f588d75d8d4d7f"
-          }
-        },
-        {
           "client_id": "252105781057-7pcmfd5l8lc2p1lfkp12ueje5f57p7uu.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -82,6 +81,13 @@
             {
               "client_id": "252105781057-7pcmfd5l8lc2p1lfkp12ueje5f57p7uu.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "252105781057-2rstpvp0p4bqlp2vikjsnimt53pm8bvq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.sChat"
+              }
             }
           ]
         }

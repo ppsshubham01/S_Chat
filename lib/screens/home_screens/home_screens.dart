@@ -27,7 +27,12 @@ class _HomeScreenState extends State<HomeScreen> {
     NewsPage(),
     SettingPage(),
   ];
-
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    debugDumpRenderTree();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

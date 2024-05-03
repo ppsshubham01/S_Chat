@@ -8,7 +8,9 @@ import 'package:s_chat/res/components/round_button.dart';
 import 'package:s_chat/screens/auth_screens/otp_screen.dart';
 import 'package:s_chat/screens/home_screens/home_screens.dart';
 import 'package:s_chat/screens/home_screens/setting_page.dart';
+import 'package:s_chat/services/firebase_api.dart';
 
+import '../../services/auth_services/auth_services.dart';
 import 'login_screen.dart';
 
 class PhoneAuth extends StatefulWidget {
@@ -22,6 +24,9 @@ class _PhoneAuthState extends State<PhoneAuth> {
   final TextEditingController _phoneController = TextEditingController();
   Rx<User?> savedUser = Rx<User?>(null);
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseApi firebaseApi = FirebaseApi();
+
+  final AuthServicesController authServicesController = AuthServicesController();
 
   Future registerUser(String mobile, BuildContext context) async {
     FirebaseAuth auth0 = FirebaseAuth.instance;
@@ -91,40 +96,40 @@ class _PhoneAuthState extends State<PhoneAuth> {
     );
   }
 
-  signInWithGoogle() async {
-    try {
-      GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
-      GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
-
-      AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth?.accessToken,
-        idToken: googleAuth?.idToken,
-      );
-
-      UserCredential user =
-          await FirebaseAuth.instance.signInWithCredential(credential);
-      savedUser.value = user.user;
-
-      print('user name: ${user.user?.displayName}');
-      print('user email: ${user.user?.email}');
-      print('savedUser.value: ${savedUser.value!}');
-      // Once signed in, return the UserCredential
-      // if(user.user != null){
-      //   Get.to(HomeScreen());
-      // }
-      // return await FirebaseAuth.instance.signInWithCredential(credential);
-
-      _firestore.collection('users').doc(user.user?.uid).set({
-        'uid': user.user?.uid,
-        'email': user.user?.email,
-        'photoURL': user.user?.photoURL,
-        'displayName': user.user?.displayName,
-      }, SetOptions(merge: true));
-    } catch (e) {
-      print('Google signin error $e');
-    }
-  }
+  // signInWithGoogle() async {
+  //   try {
+  //     GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+  //
+  //     GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+  //
+  //     AuthCredential credential = GoogleAuthProvider.credential(
+  //       accessToken: googleAuth?.accessToken,
+  //       idToken: googleAuth?.idToken,
+  //     );
+  //
+  //     UserCredential user =
+  //         await FirebaseAuth.instance.signInWithCredential(credential);
+  //     savedUser.value = user.user;
+  //
+  //     print('user name: ${user.user?.displayName}');
+  //     print('user email: ${user.user?.email}');
+  //     print('savedUser.value: ${savedUser.value!}');
+  //     // Once signed in, return the UserCredential
+  //     // if(user.user != null){
+  //     //   Get.to(HomeScreen());
+  //     // }
+  //     // return await FirebaseAuth.instance.signInWithCredential(credential);
+  //
+  //     _firestore.collection('users').doc(user.user?.uid).set({
+  //       'uid': user.user?.uid,
+  //       'email': user.user?.email,
+  //       'photoURL': user.user?.photoURL,
+  //       'displayName': user.user?.displayName,
+  //     }, SetOptions(merge: true));
+  //   } catch (e) {
+  //     print('Google signin error $e');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -215,7 +220,7 @@ class _PhoneAuthState extends State<PhoneAuth> {
                 Center(
                   child: IconButton(
                       onPressed: () {
-                        signInWithGoogle();
+                        authServicesController.signInWithGoogle();
                       },
                       icon: const Icon(
                         Icons.g_mobiledata_outlined,

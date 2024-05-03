@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'dart:developer' as developer;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -41,9 +41,9 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key, required this.appTheme});
+  const MyApp({super.key,  this.appTheme});
 
-  final AppTheme appTheme;
+  final AppTheme? appTheme;
 
   @override
   State<MyApp> createState() => _MyAppState();
