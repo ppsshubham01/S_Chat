@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:s_chat/screens/auth_screens/auth_gate.dart';
 import '../../res/widgets/widgets.dart';
 import 'package:get/get.dart';
 
@@ -179,7 +180,7 @@ class _SettingPageState extends State<SettingPage> {
                                           onPressed: () async {
                                             await GoogleSignIn().signOut();
                                             FirebaseAuth.instance.signOut();
-                                            Get.back();
+                                            Get.offAll(const AuthGate());
                                           },
                                           child: const Text(
                                             'YES',

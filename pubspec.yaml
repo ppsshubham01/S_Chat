@@ -58,6 +58,8 @@ dependencies:
   permission_handler: ^11.3.1
   camera: ^0.10.5+9
   crop_image: ^1.0.12
+  firebase_crashlytics: ^3.5.4
+  connectivity_plus: ^6.0.3
   #  stream_chat_flutter_core: ^7.2.0
 
 dev_dependencies:

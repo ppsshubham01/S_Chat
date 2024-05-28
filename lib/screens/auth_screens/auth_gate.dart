@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:s_chat/screens/auth_screens/welcom_phone_auth.dart';
@@ -11,10 +14,28 @@ class AuthGate extends StatefulWidget {
 }
 
 class _AuthGateState extends State<AuthGate> {
+ late StreamSubscription connsub;
+
+ @override
+  void initState() {
+    super.initState();
+    // connsub = Connectivity().onConnectivityChanged.listen(checkConnectivity);
+  }
+
+  void checkConnectivity(ConnectivityResult result){
+   setState(() {
+
+   });
+   // switch(result){
+   //   case ConnectivityResult.mobile:
+   //     setState(() {
+   //
+   //     });
+   // }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('abc'),),
       body: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {

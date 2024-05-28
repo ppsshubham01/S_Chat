@@ -1,6 +1,8 @@
 import 'dart:io';
-import 'dart:developer' as developer;
+import 'dart:ui';
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
@@ -10,6 +12,7 @@ import 'package:s_chat/res/theme.dart';
 import 'package:s_chat/screens/auth_screens/auth_gate.dart';
 import 'package:s_chat/services/auth_services/auth_services.dart';
 import 'package:s_chat/services/firebase_api.dart';
+
 import 'firebase_options.dart';
 import 'model/notes_models/noteM.dart';
 
@@ -35,6 +38,15 @@ void main() async {
 
   ///Push Notification using firebase
   await FirebaseApi().initPushNotification();
+
+  /// Firebase Crashlytics
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+
   runApp(MyApp(
     appTheme: AppTheme(),
   ));
@@ -55,7 +67,6 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      // return MaterialApp(
       debugShowCheckedModeBanner: false,
       // theme: appTheme.light,
       theme: ThemeData(
