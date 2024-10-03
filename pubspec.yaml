@@ -60,6 +60,7 @@ dependencies:
   crop_image: ^1.0.12
   firebase_crashlytics: ^3.5.4
   connectivity_plus: ^6.0.3
+  flutter_local_notifications: ^17.2.3
   #  stream_chat_flutter_core: ^7.2.0
 
 dev_dependencies:

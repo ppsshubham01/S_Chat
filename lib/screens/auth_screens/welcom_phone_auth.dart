@@ -2,16 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:s_chat/res/components/round_Textfield.dart';
 import 'package:s_chat/res/components/round_button.dart';
 import 'package:s_chat/screens/auth_screens/otp_screen.dart';
 import 'package:s_chat/screens/home_screens/home_screens.dart';
 import 'package:s_chat/screens/home_screens/setting_page.dart';
 import 'package:s_chat/services/firebase_api.dart';
 
+import '../../controllers/variable_controller.dart';
 import '../../services/auth_services/auth_services.dart';
-import 'login_screen.dart';
+import '../../widgets/comman.dart';
 
 class PhoneAuth extends StatefulWidget {
   const PhoneAuth({super.key});
@@ -25,6 +24,9 @@ class _PhoneAuthState extends State<PhoneAuth> {
   Rx<User?> savedUser = Rx<User?>(null);
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseApi firebaseApi = FirebaseApi();
+
+  VariableController variableController = Get.put(VariableController());
+
 
   final AuthServicesController authServicesController = AuthServicesController();
 
@@ -174,22 +176,6 @@ class _PhoneAuthState extends State<PhoneAuth> {
                 const SizedBox(
                   height: 5,
                 ),
-                // TextFormField(
-                //   decoration: InputDecoration(
-                //     enabledBorder: OutlineInputBorder(
-                //       borderRadius: BorderRadius.circular(12),
-                //       // borderSide: const BorderSide(color: Colors.grey),
-                //     ),
-                //     focusedBorder: OutlineInputBorder(
-                //       borderRadius: BorderRadius.circular(12),
-                //       borderSide: const BorderSide(color: Colors.grey),
-                //     ),
-                //     filled: true,
-                //     fillColor: Colors.grey,
-                //     hintText: 'Enter Password',
-                //   ),
-                //   controller: _passController,
-                // ),
                 const SizedBox(
                   height: 10,
                 ),
@@ -218,7 +204,7 @@ class _PhoneAuthState extends State<PhoneAuth> {
                   thickness: 3,
                 ),
                 Center(
-                  child: IconButton(
+                  child:  variableController.isLoading.value ? const CircularProgressIndicator() : IconButton(
                       onPressed: () {
                         authServicesController.signInWithGoogle();
                       },

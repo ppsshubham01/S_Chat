@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
-import 'package:s_chat/main.dart';
 import 'package:s_chat/screens/auth_screens/auth_gate.dart';
 
 void main() {

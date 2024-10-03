@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:s_chat/res/components/round_button.dart';
@@ -69,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
               obscuringCharacter: '@',
               keyboardType: TextInputType.visiblePassword,
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             RoundButton(title: "Login", onPress: () {

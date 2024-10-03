@@ -2,9 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:s_chat/controllers/variable_controller.dart';
+import 'package:s_chat/widgets/comman.dart';
 
 class AuthServicesController extends GetxController {
   Rx<User?> user = Rx<User?>(null);
+  VariableController variableController = Get.put(VariableController());
 
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
 
@@ -12,13 +15,14 @@ class AuthServicesController extends GetxController {
   Future<void> signInWithGoogle() async {
     try {
       GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
+      variableController.isLoading.value = true;
       GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
-
       AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
+
+      print("object 4");
 
       // Sign in with Firebase
       UserCredential userCredential =
@@ -32,8 +36,9 @@ class AuthServicesController extends GetxController {
         'uid': userCredential.user?.uid,
         'email': userCredential.user?.email
       },SetOptions(merge: true));
+      variableController.isLoading.value = false;
     } catch (e) {
-      print('Google signin error $e');
+      print('Google signing error $e');
     }
   }
 }
