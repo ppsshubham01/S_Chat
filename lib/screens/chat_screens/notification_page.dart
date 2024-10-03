@@ -29,7 +29,8 @@ class _NotificationPageState extends State<NotificationPage> {
         child: ElevatedButton(
             onPressed: () async{
               await requestPermission();
-              NotificationService().showNotification(title: 'Sample title', body: 'It works!');
+              // NotificationService().showNotification(title: 'Sample title', body: 'It works!');
+              NotificationService().showNotification();
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[700]),
             child: const Text("Notify me",style: TextStyle(color: Colors.white),)),
