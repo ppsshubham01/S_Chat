@@ -479,7 +479,7 @@ class DisplayPictureScreen extends StatelessWidget {
   _finished(BuildContext context) async {
     final image = await cropController.croppedImage();
     await showDialog<bool>(
-      context: context,
+      context: Get.context!,
       builder: (context) {
         return SimpleDialog(
           contentPadding: const EdgeInsets.all(6.0),

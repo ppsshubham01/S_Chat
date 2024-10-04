@@ -10,7 +10,6 @@ import 'package:s_chat/services/firebase_api.dart';
 
 import '../../controllers/variable_controller.dart';
 import '../../services/auth_services/auth_services.dart';
-import '../../widgets/comman.dart';
 
 class PhoneAuth extends StatefulWidget {
   const PhoneAuth({super.key});

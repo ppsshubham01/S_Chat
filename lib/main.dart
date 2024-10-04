@@ -12,11 +12,15 @@ import 'package:s_chat/res/theme.dart';
 import 'package:s_chat/screens/auth_screens/auth_gate.dart';
 import 'package:s_chat/services/auth_services/auth_services.dart';
 import 'package:s_chat/services/firebase_api.dart';
-
+import 'package:s_chat/services/notification_service.dart';
 import 'firebase_options.dart';
 import 'model/notes_models/noteM.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService.init();
+  await NotificationService().requestPermission();
+
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   Directory appDocumentDire = await getApplicationDocumentsDirectory();
   // Hive.init(appDocumentDire.path);
