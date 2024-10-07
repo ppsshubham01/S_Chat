@@ -1,9 +1,8 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:rxdart/rxdart.dart';
-
 
 class NotificationService {
   static FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -14,12 +13,13 @@ class NotificationService {
       await Permission.notification.request();
     }
   }
+
   static final onClickNotification = BehaviorSubject<String>();
+
   static void onNotificationTap(NotificationResponse notificationResponse) {
     onClickNotification.add(notificationResponse.payload!);
   }
 
-  /// initialized localNotification
   static Future init() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
@@ -68,7 +68,7 @@ class NotificationService {
   }) async {
     const AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails('repeating channel id', 'your channel name',
-            channelDescription:  'your channel description',
+            channelDescription: 'your channel description',
             importance: Importance.max,
             priority: Priority.high,
             ticker: 'ticker',
@@ -104,13 +104,13 @@ class NotificationService {
                 channelDescription: 'your channel description',
                 importance: Importance.max,
                 priority: Priority.high,
-                ticker: 'ticker',sound: RawResourceAndroidNotificationSound('baby'))),
+                ticker: 'ticker',
+                sound: RawResourceAndroidNotificationSound('baby'))),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
-        UILocalNotificationDateInterpretation.absoluteTime,
+            UILocalNotificationDateInterpretation.absoluteTime,
         payload: payload);
   }
-
 
   // close a specific channel notification
   static Future cancel(int id) async {

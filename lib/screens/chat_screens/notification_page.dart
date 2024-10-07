@@ -1,17 +1,18 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:s_chat/screens/home_screens/home_screens.dart';
 import 'package:s_chat/services/notification_service.dart';
 
-class NotificationPage extends StatefulWidget {
-  NotificationPage({super.key, this.message});
+class NotificationScreen extends StatefulWidget {
+  NotificationScreen({super.key, this.message});
 
   RemoteMessage? message;
 
   @override
-  State<NotificationPage> createState() => _NotificationPageState();
+  State<NotificationScreen> createState() => _NotificationScreenState();
 }
 
-class _NotificationPageState extends State<NotificationPage> {
+class _NotificationScreenState extends State<NotificationScreen> {
 
   @override
   void initState() {
@@ -21,13 +22,22 @@ class _NotificationPageState extends State<NotificationPage> {
   listenToNotifications() {
     print("Listening to notification");
     NotificationService.onClickNotification.stream.listen((event) {
-      print(event);
+      print(' Listening to notification 11 $event');
       Navigator.pushNamed(context, '/another', arguments: event);
+      Navigator.push(context, MaterialPageRoute(builder: (_)=> const HomeScreen()));
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    Map payLoad ={};
+    // final data = ModalRoute.of(context)!.settings.arguments as RemoteMessage; //
+    // if(data is RemoteMessage){
+    //   payLoad = data.data;
+    // }
+    // if (data is NotificationResponse){
+    //   payLoad = jsonDecode(data.data.toString());
+    // }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notifications'),

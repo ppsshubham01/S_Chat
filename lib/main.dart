@@ -6,60 +6,84 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
-import 'package:hive_flutter/adapters.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:s_chat/res/theme.dart';
 import 'package:s_chat/screens/auth_screens/auth_gate.dart';
-import 'package:s_chat/services/auth_services/auth_services.dart';
 import 'package:s_chat/services/firebase_api.dart';
 import 'package:s_chat/services/notification_service.dart';
+
 import 'firebase_options.dart';
 import 'model/notes_models/noteM.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  /// Initialize Notification Service
   await NotificationService.init();
   await NotificationService().requestPermission();
 
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  Directory appDocumentDire = await getApplicationDocumentsDirectory();
-  // Hive.init(appDocumentDire.path);
-  ///Hive Database
-  Hive
-    ..init(appDocumentDire.path)
-    ..registerAdapter(NotesModelAdapter());
-  await Hive.initFlutter();
-  await Hive.openBox('noteBox');
+  /// Initialize Hive database
+  await _initHiveDatabase();
 
-  ///Native SplashScreen
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  FlutterNativeSplash.remove();
+  /// Initialize Firebase and Firebase services (FCM, Crashlytics)
+  await _initFirebase();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  Get.put(AuthServicesController());
+  /// Native SplashScreen
+  _setupSplashScreen();
 
-  ///Push Notification using firebase
-  await FirebaseApi().initPushNotification();
-
-  /// Firebase Crashlytics
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-  // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
-  PlatformDispatcher.instance.onError = (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    return true;
-  };
+  /// Set up global error handling for Crashlytics
+  _setupCrashlytics();
 
   runApp(MyApp(
     appTheme: AppTheme(),
   ));
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key,  this.appTheme});
+/// Function to initialize Hive database and open required boxes
+Future<void> _initHiveDatabase() async {
+  Directory appDocumentDir = await getApplicationDocumentsDirectory();
+  Hive.init(appDocumentDir.path);
+  Hive.registerAdapter(
+      NotesModelAdapter()); // Registering the NotesModel adapter
+  await Hive.initFlutter();
+  await Hive.openBox('noteBox'); // Opening a box for notes storage
+}
 
+/// Function to initialize Firebase, Firebase Messaging, and handle notifications
+Future<void> _initFirebase() async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  await FirebaseApi().initializeFirebaseNotifications(); // Initialize Firebase Push Notifications
+}
+
+/// Set up native splash screen and handle removal after initialization
+void _setupSplashScreen() {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  FlutterNativeSplash.remove();
+}
+
+/// Set up Crashlytics for handling errors globally
+void _setupCrashlytics() {
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+  // Capture uncaught asynchronous errors and report to Crashlytics
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+}
+
+/// Main App widget with theme and navigation setup
+class MyApp extends StatefulWidget {
   final AppTheme? appTheme;
+
+  MyApp({super.key, this.appTheme});
+
+  final navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -71,16 +95,15 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      navigatorKey: widget.navigatorKey,// Global navigator key for navigation
       debugShowCheckedModeBanner: false,
-      // theme: appTheme.light,
       theme: ThemeData(
-          useMaterial3: true,
-          brightness: isDark ? Brightness.dark : Brightness.light),
-      // darkTheme: appTheme.dark,
+        useMaterial3: true,
+        brightness:
+            isDark ? Brightness.dark : Brightness.light,
+      ),
       themeMode: ThemeMode.light,
       home: const AuthGate(),
-      // routes: NotificationPage
-      // getPages: AppRoutes.appRoutes(),
     );
   }
 }

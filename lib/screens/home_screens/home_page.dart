@@ -100,7 +100,7 @@ class _HomePageState extends State<HomePage> {
                   // PermissionHandling().getFromGallery(context);
                 },
                 icon: const Icon(Icons.camera_alt_outlined)),
-            IconButton(onPressed: () {Get.to(NotificationPage());}, icon: const Icon(Icons.notifications)),
+            IconButton(onPressed: () {Get.to(NotificationScreen());}, icon: const Icon(Icons.notifications)),
             // IconButton(
             //     onPressed: () {}, icon: const Icon(Icons.more_vert_outlined))
             PopupMenuButton<String>(

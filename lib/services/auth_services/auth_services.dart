@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:s_chat/controllers/variable_controller.dart';
-import 'package:s_chat/widgets/comman.dart';
 
 class AuthServicesController extends GetxController {
   Rx<User?> user = Rx<User?>(null);
@@ -22,7 +21,6 @@ class AuthServicesController extends GetxController {
         idToken: googleAuth?.idToken,
       );
 
-      print("object 4");
 
       // Sign in with Firebase
       UserCredential userCredential =
@@ -30,8 +28,6 @@ class AuthServicesController extends GetxController {
 
       // Update user data in the controller
       user.value = userCredential.user;
-      print('user name: ${user.value?.displayName}');
-      print('user email: ${user.value?.email}');
       _fireStore.collection('users').doc(userCredential.user?.uid).set({
         'uid': userCredential.user?.uid,
         'email': userCredential.user?.email
