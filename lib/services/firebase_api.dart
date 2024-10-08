@@ -4,9 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:s_chat/main.dart';
 import 'package:s_chat/screens/chat_screens/notification_page.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class FirebaseApi {
   static FirebaseAuth auth = FirebaseAuth.instance;
@@ -15,19 +18,25 @@ class FirebaseApi {
   static FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  static final FirebaseMessaging _firebaseMessaging =
-      FirebaseMessaging.instance;
-
   /// Function to initialize Firebase Push Notifications
   Future<void> initializeFirebaseNotifications() async {
     // Request notification permission from the user
-    await _firebaseMessaging.requestPermission(
-        alert: true, sound: true, badge: true, announcement: true);
+    FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
-    final fcmToken = await _firebaseMessaging.getToken();
+    NotificationSettings settings = await firebaseMessaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+
+    final fcmToken = await firebaseMessaging.getToken();
     print('FCM Token: $fcmToken');
 
-    final apnsToken = await _firebaseMessaging.getAPNSToken();
+    final apnsToken = await firebaseMessaging.getAPNSToken();
     print('APNs Token: $apnsToken');
 
     /// Automatically initialize Firebase Messaging
@@ -40,24 +49,31 @@ class FirebaseApi {
       handleIncomingMessages(initialMessage);
     }
 
-    // Handle when the app is opened from the background (notification tap)
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      handleIncomingMessages(message);
-    });
+    // // Handle when the app is opened from the background (notification tap)
+    // FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    //   handleIncomingMessages(message);
+    // });
 
     // Handle foreground notifications
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print("Received a foreground message");
-      handleIncomingMessages(message);
+      print('Got a message whilst in the foreground!');
+      print('Message data: ${message.data}');
+
+      if (message.notification != null) {
+        print('Message also contained a notification: ${message.notification}');
+        handleIncomingMessages(message);
+      }
     });
 
     // Handle background and terminated state (merged background handler)
+
     FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
       handleIncomingMessages(message);
     });
   }
 
   /// Function to handle incoming messages in the background or foreground
+  @pragma("vm:entry-point")
   Future<void> handleIncomingMessages(RemoteMessage message) async {
     if (message.notification == null) return;
 
@@ -113,39 +129,79 @@ class FirebaseApi {
   }
 
   /// Function to show a simple local notification
+  @pragma("vm:entry-point")
   static Future<void> showSimpleNotification({
     required String title,
     required String body,
     required String payload,
   }) async {
-    const AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails(
-      'your_channel_id',
-      'your_channel_name',
-      channelDescription: 'your_channel_description',
-      importance: Importance.max,
-      priority: Priority.high,
-      ticker: 'ticker',
-      color: Colors.green,
-      // colorized: true,
-      playSound: true,
-          enableVibration: true,
-      sound: RawResourceAndroidNotificationSound('baby'),
-    );
-
     // await flutterLocalNotificationsPlugin
     //     .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
     //     ?.createNotificationChannel(androidNotificationDetails as AndroidNotificationChannel);
 
-    const NotificationDetails notificationDetails =
-        NotificationDetails(android: androidNotificationDetails);
-
+    print("this one is cool ");
     await flutterLocalNotificationsPlugin.show(
       0,
       title,
       body,
-      notificationDetails,
+      const NotificationDetails(
+          android: AndroidNotificationDetails(
+        'notification_id',
+        'NotificationName',
+        channelDescription: 's_chatter_description',
+        importance: Importance.max,
+        priority: Priority.high,
+        ticker: 'ticker',
+        color: Colors.green,
+        playSound: true,
+        enableVibration: true,
+        sound: RawResourceAndroidNotificationSound('baby'),
+      )),
       payload: payload,
     );
+  }
+
+
+
+  static const platform = MethodChannel('com.example.notifications');
+
+  Future<void> showCustomNotification(String title, String body) async {
+    try {
+      await platform.invokeMethod('showNotification', {
+        'title': title,
+        'body': body,
+        'sound': 'baby',
+      });
+    } on PlatformException catch (e) {
+      print("Failed to show notification: '${e.message}'.");
+    }
+  }
+
+
+  // to schedule a local notification
+  @pragma("vm:entry-point")
+  static Future showScheduleNotification({
+    required String title,
+    required String body,
+    required String payload,
+  }) async {
+    tz.initializeTimeZones();
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+        2,
+        title,
+        body,
+        tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5)),
+        const NotificationDetails(
+            android: AndroidNotificationDetails(
+                'channel 3', 'your channel name',
+                channelDescription: 'your channel description',
+                importance: Importance.max,
+                priority: Priority.high,
+                ticker: 'ticker',
+                sound: RawResourceAndroidNotificationSound('baby'))),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+        UILocalNotificationDateInterpretation.absoluteTime,
+        payload: payload);
   }
 }

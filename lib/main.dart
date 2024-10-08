@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
@@ -22,6 +23,9 @@ void main() async {
   /// Initialize Notification Service
   await NotificationService.init();
   await NotificationService().requestPermission();
+  // FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
+  //   FirebaseApi().handleIncomingMessages(message);
+  // });
 
   /// Initialize Hive database
   await _initHiveDatabase();
@@ -51,7 +55,7 @@ Future<void> _initHiveDatabase() async {
 }
 
 /// Function to initialize Firebase, Firebase Messaging, and handle notifications
-Future<void> _initFirebase() async {
+Future<void> _initFirebase( ) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

@@ -66,6 +66,14 @@
           }
         },
         {
+          "client_id": "252105781057-40237gerld1pa9m936kfggf8c7pbsksb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.s_chat",
+            "certificate_hash": "5f54581601be8fcb23957af629fe2447eb185eb0"
+          }
+        },
+        {
           "client_id": "252105781057-7pcmfd5l8lc2p1lfkp12ueje5f57p7uu.apps.googleusercontent.com",
           "client_type": 3
         }

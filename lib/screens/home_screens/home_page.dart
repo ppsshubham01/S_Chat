@@ -100,7 +100,11 @@ class _HomePageState extends State<HomePage> {
                   // PermissionHandling().getFromGallery(context);
                 },
                 icon: const Icon(Icons.camera_alt_outlined)),
-            IconButton(onPressed: () {Get.to(NotificationScreen());}, icon: const Icon(Icons.notifications)),
+            IconButton(
+                onPressed: () {
+                  Get.to(NotificationScreen());
+                },
+                icon: const Icon(Icons.notifications)),
             // IconButton(
             //     onPressed: () {}, icon: const Icon(Icons.more_vert_outlined))
             PopupMenuButton<String>(
@@ -253,17 +257,17 @@ class _HomePageState extends State<HomePage> {
                 backgroundImage: NetworkImage(
                     data['photoURL'] ?? 'https://source.unsplash.com/random'),
               ),
-              title: Text(data['displayName']), //photoURL
+              title: Text(data['displayName'] ?? 'Unknown'), //photoURL
               onTap: () {
                 Get.to(MessagePage(
                   receiverEmail: data['email'],
-                  uid: data['uid'],
-                  receiverName: data['displayName'],
-                  photoURL: data['photoURL'],
+                  uid: data['uid'] ?? '',
+                  receiverName: data['displayName'] ?? 'Unknown',
+                  photoURL: data['photoURL'] ?? '',
                 ));
               },
             ))
-        : const SizedBox();
+        : const ColoredBox(color: Colors.transparent);
   }
 }
 
@@ -271,7 +275,6 @@ class _HomePageState extends State<HomePage> {
 ///
 
 // A screen that allows users to take a picture using a given camera.
-
 
 // A screen that allows users to take a picture using a given camera.
 class TakePictureScreen extends StatefulWidget {
@@ -491,8 +494,11 @@ class DisplayPictureScreen extends StatelessWidget {
             const SizedBox(height: 5),
             image,
             TextButton(
-              onPressed: () => Navigator.pushAndRemoveUntil(
-                  context, MaterialPageRoute(builder: (_) => const HomeScreen()), (route) {return false;} ),
+              onPressed: () => Navigator.pushAndRemoveUntil(context,
+                  MaterialPageRoute(builder: (_) => const HomeScreen()),
+                  (route) {
+                return false;
+              }),
               child: const Text('OK'),
             ),
           ],

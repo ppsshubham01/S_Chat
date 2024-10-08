@@ -17,46 +17,37 @@ class NotesPage extends StatefulWidget {
 }
 
 class _NotesPageState extends State<NotesPage> {
-  List<NotesModel> notesOfList = [
-    // NotesModel(title: "oh achha essa", content: 'Welcome to S-Chat'),
-    // NotesModel(title: "Hello There", content: 'Achha laga apse dubara mil kr'),
-  ];
-
-  HiveHelperDB hiveHelperDB = HiveHelperDB();
+  List<NotesModel> notesOfList = [];
+  final HiveHelperDB hiveHelperDB = HiveHelperDB();
   final ref = FirebaseFirestore.instance
       .collection('notesNoted')
       .doc(FirebaseAuth.instance.currentUser!.uid)
       .collection('nts');
-
-  // NotesModel notesModelss = NotesModel(title: 'title', content: 'content');
   final TextEditingController searchController = TextEditingController();
 
   void addOrEditNote(NotesModel notesModel) {
     setState(() {
       var existNote = notesOfList.firstWhere(
         (n) => n.title == notesModel.title,
-        // orElse: null,
       );
-      print("existNote: $existNote");
-      if (existNote != null) {
-        // existNote.content = notesModel.content;
-      } else {
-        notesOfList.add(notesModel);
+      // orElse: () => NotesModel(id: '', title: '', description: '')); // Avoids null errors
+      if (existNote.title.isEmpty) {
+        notesOfList.add(notesModel); // Adds new note if not found
       }
     });
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     fetchAndSetData();
   }
 
   void fetchAndSetData() {
+    // Uncomment and fetch data if needed from Hive DB
     // List<NotesModel> tempnoteList = hiveHelperDB.fetchData();
     // notesOfList.addAll(tempnoteList);
-    // setState(() {});
+    setState(() {});
   }
 
   @override
@@ -65,55 +56,33 @@ class _NotesPageState extends State<NotesPage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.green,
-        // title: const Text('Your Notes'),
-        title: RichText(
-          text: const TextSpan(
-            text: 'Your',
-            style: TextStyle(color: Colors.black38, fontSize: 20),
-            children: <TextSpan>[
-              TextSpan(
-                  text: ' ', style: TextStyle(fontWeight: FontWeight.bold)),
-              TextSpan(
-                  text: 'Notes',
-                  style: TextStyle(
-                      color: Colors.black54, fontWeight: FontWeight.bold)),
-            ],
-          ),
+        title: const Text(
+          'Your Notes',
+          style: TextStyle(color: Colors.black54, fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
               onPressed: () async {
-                // // Get.toNamed(RouteName.notesEditScreen); question for routes in passing arguments
-                // NotesModel dinalD =Get.to(() => NotesEditScreen(onSave: addOrEditNote)) as NotesModel;
                 NotesModel finalData = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => NotesEditScreen(
-                            // notesModel: notesModelss,
-                            onSave: addOrEditNote)));
-                print("dknsdknvjknvjksdnvjdksn : ${finalData.title}");
-                setState(() {
-                  // notesModelss = finalData;
-                  notesOfList.add(finalData);
-                });
+                        builder: (_) =>
+                            NotesEditScreen(onSave: addOrEditNote)));
+                setState(() => notesOfList.add(finalData));
               },
               icon: const Icon(Icons.add)),
           PopupMenuButton<String>(
-            onSelected: (value) {
-              print(value);
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                const PopupMenuItem(
-                  value: "View Gride/List",
-                  child: Text("View"),
-                ),
-                const PopupMenuItem(
-                  value: "Sync with Google",
-                  child: Text("Sync"),
-                ),
-              ];
-            },
+            // onSelected: (value) => print(value),
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: "View Gride/List",
+                child: Text("View"),
+              ),
+              const PopupMenuItem(
+                value: "Sync with Google",
+                child: Text("Sync"),
+              ),
+            ],
           )
         ],
       ),
@@ -121,127 +90,171 @@ class _NotesPageState extends State<NotesPage> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Center(
               child: RoundTextField(
                 width: double.infinity,
-                onPressed: () {},
                 controller: searchController,
                 hintText: 'search here',
-                // keyboardType: TextInputType.number,
                 textbackgroundColor: Colors.white,
-                suffixOnPressed: () {
-                  // searchController.clear();
-                },
+                onPressed: () {},
               ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            // GetBuilder(builder: (NoteController noteController){
-            //   return noteController.notes.length == 0 ? const Center(
-            //     child: Text("No data found !"),
-            //   ): ListView.builder(
-            //       itemCount: noteController.notes.length,
-            //       itemBuilder: (context, index){
-            //         return NoteView(note: noteController.notes[index]);
-            //       }
-            //   );
-            // }),
+            const SizedBox(height: 10),
             Flexible(
               child: StreamBuilder(
                 stream: ref.snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshots) {
-                  return SingleChildScrollView(
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        // itemCount: notesOfList.length,
-                        itemCount:
-                            snapshots.hasData ? snapshots.data?.docs.length : 0,
-                        itemBuilder: (_, index) {
-                          final notes = snapshots.data?.docs[index];
-                          // final note = notesOfList[index];
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ListTile(
-                              title: Text(
-                                // notesOfList[index].title,
-                                notes?['title'],
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              subtitle: Text(
-                                notes?['content'],
-                                maxLines: 1,
-                                // notesOfList[index].content.split('\n').first,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                  side: const BorderSide(
-                                      color: Colors.black, width: 1),
-                                  borderRadius: BorderRadius.circular(10)),
-                              onTap: () async {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => NotesEditScreen(
-                                            // notesModel: notes,
-                                            onSave: addOrEditNote)));
-                              },
-                              trailing: IconButton(
-                                  onPressed: () {
-                                    showDialog<String>(
-                                      context: context,
-                                      builder: (BuildContext context) =>
-                                          AlertDialog(
-                                        title: const Text(
-                                          'Delete?',
-                                          style: TextStyle(
-                                              color: Colors.redAccent),
-                                        ),
-                                        content: const Text(
-                                            'sure you want to delete this note!'),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            onPressed: () => Navigator.pop(
-                                                context, 'Cancel'),
-                                            child: const Text('Cancel'),
+                  if (!snapshots.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: snapshots.data?.docs.length ?? 0,
+                    itemBuilder: (_, index) {
+                      final notes = snapshots.data?.docs[index];
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ListTile(
+                          title: Text(
+                            notes?['title'] ?? '',
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Text(
+                            notes?['content'] ?? '',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          shape: RoundedRectangleBorder(
+                              side: const BorderSide(
+                                  color: Colors.black, width: 1),
+                              borderRadius: BorderRadius.circular(10)),
+                          onTap: () async {
+                            await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => NotesEditScreen(
+                                        onSave: addOrEditNote)));
+                          },
+                          trailing: IconButton(
+                            onPressed: () {
+                              Get.dialog(
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 40),
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(20),
                                           ),
-                                          TextButton(
-                                            onPressed: () {
-                                              Get.defaultDialog(
-                                                title: "Delete this Note ?",
-                                                middleText: "",
-                                                textConfirm: "Delete",
-                                                textCancel: "Cancel",
-                                                cancelTextColor:
-                                                    Colors.pinkAccent,
-                                                confirmTextColor: Colors.black,
-                                                onConfirm: () {
-                                                  widget.notesModel?.delete();
-                                                  Get.back();
-                                                },
-                                              );
-                                            },
-                                            child: const Text(
-                                              'YES',
-                                              style:
-                                                  TextStyle(color: Colors.red),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(20.0),
+                                          child: Material(
+                                            child: Column(
+                                              children: [
+                                                const SizedBox(height: 10),
+                                                const Text(
+                                                  "Delete Note",
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                const SizedBox(height: 15),
+                                                const Text(
+                                                  "Are you Sure?",
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                const SizedBox(height: 20),
+                                                //Buttons
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: ElevatedButton(
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          foregroundColor:
+                                                              const Color(
+                                                                  0xFFFFFFFF),
+                                                          backgroundColor:
+                                                              Colors.green,
+                                                          minimumSize:
+                                                              const Size(0, 45),
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8),
+                                                          ),
+                                                        ),
+                                                        onPressed: () {
+                                                          Get.back();
+                                                          ref
+                                                              .doc(notes?.id)
+                                                              .delete()
+                                                              .then((_) =>
+                                                                  Get.snackbar(
+                                                                      "Deleted",
+                                                                      "Note has been deleted successfully"))
+                                                              .catchError((error) =>
+                                                                  Get.snackbar(
+                                                                      "Error",
+                                                                      "Failed to delete the note: $error"));
+                                                        },
+                                                        child: const Text(
+                                                          'YES',
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 10),
+                                                    Expanded(
+                                                      child: ElevatedButton(
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          foregroundColor:
+                                                              const Color(
+                                                                  0xFFFFFFFF),
+                                                          backgroundColor:
+                                                              Colors.green,
+                                                          minimumSize:
+                                                              const Size(0, 45),
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8),
+                                                          ),
+                                                        ),
+                                                        onPressed: () {
+                                                          Get.back();
+                                                        },
+                                                        child: const Text(
+                                                          'NO',
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                        ],
+                                        ),
                                       ),
-                                    );
-                                  },
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                  )),
-                            ),
-                          );
-                        }),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                          ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),

@@ -129,13 +129,13 @@ class _AllUsersState extends State<AllUsers> {
             backgroundImage: NetworkImage(
                 data['photoURL'] ?? 'https://source.unsplash.com/random'),
           ),
-          title: Text(data['displayName']), //photoURL
+          title: Text(data['displayName'] ?? 'Unknown'), //photoURL
           onTap: () {
             Get.to(MessagePage(
               receiverEmail: data['email'],
-              uid: data['uid'],
-              receiverName: data['displayName'],
-              photoURL: data['photoURL'],
+              uid: data['uid'] ?? '',
+              receiverName: data['displayName'] ?? 'Unknown',
+              photoURL: data['photoURL'] ?? '',
             ));
           },
         ),

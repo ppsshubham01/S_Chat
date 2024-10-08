@@ -1,10 +1,6 @@
 package com.example.s_chat
 
 import io.flutter.embedding.android.FlutterActivity
-//import io.flutter.plugin.common.PluginRegistry;
-//import io.flutter.plugins.GeneratedPluginRegistrant;
-//import androidx.core.app.ActivityCompat;
-//import android.os.Build;
 
 class MainActivity: FlutterActivity(
 
