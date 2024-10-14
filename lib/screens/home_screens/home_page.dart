@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:s_chat/screens/chat_screens/allUsers.dart';
 import 'package:s_chat/screens/chat_screens/notification_page.dart';
 import 'package:s_chat/screens/home_screens/home_screens.dart';
+import 'package:s_chat/screens/home_screens/music_page.dart';
 
 import '../chat_screens/messages_page.dart';
 
@@ -92,6 +93,11 @@ class _HomePageState extends State<HomePage> {
           title: const Text(' ¯_ツ_¯'),
           actions: [
             IconButton(
+                onPressed: () {
+                  Get.to(MusicPage());
+
+                },
+                icon: const Icon(Icons.music_note_outlined)), IconButton(
                 onPressed: () {
                   // TakePictureScreen(
                   //   camera: firstCamera!,
