@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:s_chat/res/widgets/dialog.dart';
 import 'package:s_chat/screens/chat_screens/notification_page.dart';
 
 class FirebaseApi {

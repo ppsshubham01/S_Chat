@@ -1,6 +1,5 @@
 
 import 'package:get/get.dart';
-
 import 'package:s_chat/res/routes/routes_name.dart';
 import 'package:s_chat/screens/auth_screens/welcom_phone_auth.dart';
 import 'package:s_chat/screens/home_screens/home_page.dart';
@@ -8,7 +7,6 @@ import 'package:s_chat/screens/home_screens/home_screens.dart';
 import 'package:s_chat/screens/home_screens/news_page.dart';
 import 'package:s_chat/screens/home_screens/notes_page.dart';
 import 'package:s_chat/screens/home_screens/setting_page.dart';
-import 'package:s_chat/screens/notes_screen/notes_editScreen.dart';
 
 class AppRoutes{
 

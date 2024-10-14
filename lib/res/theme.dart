@@ -36,11 +36,9 @@ abstract class _DarkColors {
   /// Light theme and its settings.
   ThemeData get light => ThemeData(
         brightness: Brightness.light,
-        colorScheme: lightBase.colorScheme.copyWith(secondary: accentColor),
         visualDensity: visualDensity,
         textTheme:
             GoogleFonts.mulishTextTheme().apply(bodyColor: AppColors.textDark),
-        backgroundColor: _LightColors.background,
         appBarTheme: lightBase.appBarTheme.copyWith(
           iconTheme: lightBase.iconTheme,
           backgroundColor: Colors.transparent,
@@ -59,19 +57,17 @@ abstract class _DarkColors {
         ),
         cardColor: _LightColors.card,
         primaryTextTheme: const TextTheme(
-          headline6: TextStyle(color: AppColors.textDark),
+          titleLarge: TextStyle(color: AppColors.textDark),
         ),
-        iconTheme: const IconThemeData(color: AppColors.iconDark),
+        iconTheme: const IconThemeData(color: AppColors.iconDark), colorScheme: lightBase.colorScheme.copyWith(secondary: accentColor).copyWith(background: _LightColors.background),
       );
 
   /// Dark theme and its settings.
   ThemeData get dark => ThemeData(
         brightness: Brightness.dark,
-        colorScheme: darkBase.colorScheme.copyWith(secondary: accentColor),
         visualDensity: visualDensity,
         textTheme:
             GoogleFonts.interTextTheme().apply(bodyColor: AppColors.textLigth),
-        backgroundColor: _DarkColors.background,
         appBarTheme: darkBase.appBarTheme.copyWith(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -88,8 +84,8 @@ abstract class _DarkColors {
         ),
         cardColor: _DarkColors.card,
         primaryTextTheme: const TextTheme(
-          headline6: TextStyle(color: AppColors.textLigth),
+          titleLarge: TextStyle(color: AppColors.textLigth),
         ),
-        iconTheme: const IconThemeData(color: AppColors.iconLight),
+        iconTheme: const IconThemeData(color: AppColors.iconLight), colorScheme: darkBase.colorScheme.copyWith(secondary: accentColor).copyWith(background: _DarkColors.background),
       );
 }

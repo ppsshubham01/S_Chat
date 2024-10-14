@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:s_chat/res/components/round_Textfield.dart';
 import 'package:s_chat/res/components/round_button.dart';
 import 'package:s_chat/screens/auth_screens/otp_screen.dart';
 import 'package:s_chat/screens/home_screens/home_screens.dart';
@@ -11,7 +9,6 @@ import 'package:s_chat/screens/home_screens/setting_page.dart';
 import 'package:s_chat/services/firebase_api.dart';
 
 import '../../services/auth_services/auth_services.dart';
-import 'login_screen.dart';
 
 class PhoneAuth extends StatefulWidget {
   const PhoneAuth({super.key});
