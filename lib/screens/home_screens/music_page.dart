@@ -153,6 +153,7 @@ class MusicPage extends GetView<AudioController> {
                                               fontSize: 14,
                                               color: Colors.white,
                                               fontWeight: FontWeight.w400,
+                                              overflow: TextOverflow.ellipsis
                                             ),
                                           ),
                                         ],

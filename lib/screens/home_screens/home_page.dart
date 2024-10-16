@@ -95,9 +95,9 @@ class _HomePageState extends State<HomePage> {
             IconButton(
                 onPressed: () {
                   Get.to(MusicPage());
-
                 },
-                icon: const Icon(Icons.music_note_outlined)), IconButton(
+                icon: const Icon(Icons.music_note_outlined)),
+            IconButton(
                 onPressed: () {
                   // TakePictureScreen(
                   //   camera: firstCamera!,
@@ -154,7 +154,7 @@ class _HomePageState extends State<HomePage> {
                     (BuildContext context, SearchController controller) {
                   return SearchBar(
                     controller: controller,
-                    padding: const MaterialStatePropertyAll<EdgeInsets>(
+                    padding: const WidgetStatePropertyAll<EdgeInsets>(
                         EdgeInsets.symmetric(horizontal: 16.0)),
                     onTap: () {
                       controller.openView();
@@ -240,8 +240,8 @@ class _HomePageState extends State<HomePage> {
             child: ListView(
               shrinkWrap: true,
               children: snapshots.data!.docs
-                  .map<Widget>((doc) => snapshots.data!.docs.length == 0
-                      ? Center(child: Text("Empty Chat List Data1111"))
+                  .map<Widget>((doc) => snapshots.data!.docs.isEmpty
+                      ? const Center(child: Text("Empty Chat List Data1111"))
                       : _buildUserListItem(doc))
                   .toList(),
             ),

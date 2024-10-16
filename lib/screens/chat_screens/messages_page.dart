@@ -8,7 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:s_chat/res/components/chatMessage_box.dart';
 import 'package:s_chat/res/components/round_Textfield.dart';
-import 'package:s_chat/res/permission/permissions.dart';
 import 'package:s_chat/services/chat_services/message_sevices.dart';
 
 class MessagePage extends StatefulWidget {

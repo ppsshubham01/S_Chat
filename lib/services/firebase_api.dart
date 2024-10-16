@@ -1,7 +1,8 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -160,8 +161,6 @@ class FirebaseApi {
     );
   }
 
-
-
   static const platform = MethodChannel('com.example.notifications');
 
   Future<void> showCustomNotification(String title, String body) async {
@@ -175,7 +174,6 @@ class FirebaseApi {
       print("Failed to show notification: '${e.message}'.");
     }
   }
-
 
   // to schedule a local notification
   @pragma("vm:entry-point")
@@ -200,7 +198,7 @@ class FirebaseApi {
                 sound: RawResourceAndroidNotificationSound('baby'))),
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
-        UILocalNotificationDateInterpretation.absoluteTime,
+            UILocalNotificationDateInterpretation.absoluteTime,
         payload: payload);
   }
 }

@@ -1,9 +1,11 @@
 import 'dart:io';
+
+import 'package:external_path/external_path.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+
 import '../model/music_model.dart';
 
 class AudioController extends GetxController {
@@ -13,9 +15,6 @@ class AudioController extends GetxController {
   final isLoading = true.obs; // Loading state
   final position = Duration.zero.obs; // Current position of the audio
   final duration = Duration.zero.obs; // Total duration of the current audio
-
-  // Cache for audio files to avoid re-fetching
-  final _audioFileCache = <String, AudioFile>{};
 
   @override
   void onInit() {
@@ -39,7 +38,7 @@ class AudioController extends GetxController {
     isLoading.value = true;
     if (await Permission.storage.request().isGranted) {
       // Fetch only the required number of audio files (e.g., first 50 for display)
-      audioFiles.value = await getAllAudioFiles(limit: 50);
+      audioFiles.value = await getAllAudioFiles(limit: 1200);
     } else {
       print("Storage permission denied");
     }
@@ -65,7 +64,7 @@ class AudioController extends GetxController {
 
     // Get the current index in the sorted list
     int currentIndexInSorted =
-    sortedAudioFiles.indexOf(audioFiles[currentFileIndex.value]);
+        sortedAudioFiles.indexOf(audioFiles[currentFileIndex.value]);
 
     // Calculate the next index in the sorted list
     int nextIndexInSorted =
@@ -86,7 +85,7 @@ class AudioController extends GetxController {
 
     // Get the current index in the sorted list
     int currentIndexInSorted =
-    sortedAudioFiles.indexOf(audioFiles[currentFileIndex.value]);
+        sortedAudioFiles.indexOf(audioFiles[currentFileIndex.value]);
 
     // Calculate the previous index in the sorted list
     int previousIndexInSorted =
@@ -145,23 +144,26 @@ class AudioController extends GetxController {
     super.onClose();
   }
 
-  // Fetch all audio files from storage with an optional limit for lazy loading
   static Future<List<AudioFile>> getAllAudioFiles({int limit = 0}) async {
     List<AudioFile> audioList = [];
-    Directory internalDir = Directory('/storage/emulated/0/');
-    final Directory? externalDir = await getExternalStorageDirectory();
 
-    // Fetch files from internal and external directories
-    if (await internalDir.exists())
+    List<String> paths = await ExternalPath.getExternalStorageDirectories();
+
+    final Directory internalDir = Directory(paths[0]);
+    final Directory externalDir = Directory(paths[1]);
+
+    if (await internalDir.exists()) {
       await _fetchAudioFiles(internalDir, audioList, limit);
-    if (externalDir != null && await externalDir.exists())
-      await _fetchAudioFiles(externalDir, audioList, limit);
+    }
 
-    print("Total audio files found: ${audioList.length}");
+    if (await externalDir.exists()) {
+      await _fetchAudioFiles(externalDir, audioList, limit);
+    }
+
+    print("Total audio files found: ${audioList.length} : $externalDir :-$paths");
     return audioList;
   }
 
-  // Helper method to recursively fetch audio files from directories with a limit
   static Future<void> _fetchAudioFiles(
       Directory dir, List<AudioFile> audioList, int limit) async {
     try {
@@ -172,12 +174,10 @@ class AudioController extends GetxController {
             (entity.path.endsWith(".mp3") ||
                 entity.path.endsWith(".wav") ||
                 entity.path.endsWith(".m4a"))) {
-          // Add audio file to the list and cache it
           audioList.add(AudioFile(path: entity.path, title: basename(entity.path)));
 
-          // Check if we reached the limit
           if (limit > 0 && audioList.length >= limit) {
-            break; // Exit the loop if we reached the limit
+            break;
           }
         }
       }
@@ -185,4 +185,5 @@ class AudioController extends GetxController {
       print("Error fetching files from ${dir.path}: $e");
     }
   }
+
 }
