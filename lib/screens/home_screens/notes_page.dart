@@ -2,10 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:s_chat/model/notes_models/noteM.dart';
-import 'package:s_chat/res/components/round_Textfield.dart';
-import 'package:s_chat/screens/notes_screen/notes_editScreen.dart';
+import 'package:s_chat/model/notes_models/note_.dart';
+import 'package:s_chat/screens/notes_screen/notes_edit_screen.dart';
 import 'package:s_chat/services/hiveDb/database.dart';
+
+import '../../res/components/round_text_form_field.dart';
 
 class NotesPage extends StatefulWidget {
   final NotesModel? notesModel;

@@ -2,9 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:s_chat/res/components/round_Textfield.dart';
-
-import 'messages_page.dart';
+import 'package:s_chat/res/components/round_text_form_field.dart';
+import 'package:s_chat/screens/chat_screens/chating_page/chating_page.dart';
 
 class AllUsers extends StatefulWidget {
   const AllUsers({super.key});
@@ -20,12 +19,12 @@ class _AllUsersState extends State<AllUsers> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  late Stream<QuerySnapshot> _userStream;
+  late Stream<QuerySnapshot> userStream;
 
   @override
   void initState() {
     super.initState();
-    _userStream = FirebaseFirestore.instance.collection('users').snapshots();
+    userStream = FirebaseFirestore.instance.collection('users').snapshots();
   }
 
   // Method to filter users based on search text
@@ -90,17 +89,6 @@ class _AllUsersState extends State<AllUsers> {
             return const Center(child: Text('Loading'));
           }
 
-          // return Padding(
-          //   padding: const EdgeInsets.all(8.0),
-          //   child: ListView.builder(
-          //     itemCount: snapshots.data!.docs.length,
-          //     itemBuilder: (BuildContext context, int index) {
-          //       return _buildUserListItem(snapshots.data!.docs[index]);
-          //     },
-          //   ),
-          // );
-
-          print('dataListLength: ${snapshots.data!.docs.length}');
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: ListView(
@@ -116,8 +104,6 @@ class _AllUsersState extends State<AllUsers> {
   Widget _buildUserListItem(DocumentSnapshot documentSnapshot) {
     Map<String, dynamic> data =
         documentSnapshot.data()! as Map<String, dynamic>;
-    print('buildList chat Data${data['photoURL']}');
-
     if (_auth.currentUser!.email != data['email']) {
       return ClipRRect(
         borderRadius: const BorderRadius.only(
@@ -131,7 +117,7 @@ class _AllUsersState extends State<AllUsers> {
           ),
           title: Text(data['displayName'] ?? 'Unknown'), //photoURL
           onTap: () {
-            Get.to(MessagePage(
+            Get.to(ChattingPage(
               receiverEmail: data['email'],
               uid: data['uid'] ?? '',
               receiverName: data['displayName'] ?? 'Unknown',

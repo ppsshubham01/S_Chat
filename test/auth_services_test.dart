@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
-import 'package:s_chat/screens/auth_screens/auth_gate.dart';
+import 'package:s_chat/screens/auth_screens/auth_gate/auth_gate.dart';
 
 void main() {
   // testWidgets('Material app testing', (WidgetTester widgetTester) async {

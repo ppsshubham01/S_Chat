@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 import 'package:s_chat/controllers/note_controlller/notes_controller.dart';
 
 class HiveHelperDB {
-  final _myBox = Hive.box('noteBox');
+  // final myBox = Hive.box('noteBox');
 
   getNotes() {
     //This method return all the notes stored in our database;

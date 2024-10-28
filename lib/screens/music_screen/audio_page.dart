@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controllers/music_controller.dart';
+import 'package:s_chat/screens/music_screen/audio_page_controller.dart';
 
-class MusicPage extends GetView<AudioController> {
-  const MusicPage({super.key});
+class AudioPage extends GetView<AudioController> {
+  const AudioPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Get.put(AudioController()); // Initialize AudioController
+    Get.put(AudioController());
 
     return SafeArea(
       child: Scaffold(
@@ -80,7 +80,6 @@ class MusicPage extends GetView<AudioController> {
                         final audioFile = sortedAudioFiles[index];
                         return
                           Obx(() {
-                          print("shubham is always right");
                           final isSelected =
                               controller.currentFileIndex.value ==
                                   controller.audioFiles.indexOf(audioFile);

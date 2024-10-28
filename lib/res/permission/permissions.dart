@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +23,6 @@ class PermissionHandling extends StatelessWidget {
         permissionStatus[Permission.camera]!.isGranted) {
       getFromGallery();
     } else {
-      print('no permission provided');
       Get.defaultDialog(
         title: "no permission provided",
         middleText: "no permission provided!,Please Provide",
@@ -44,7 +41,7 @@ class PermissionHandling extends StatelessWidget {
   }
 
   Future<bool> checkPermanentlyDenied() async {
-    final permission = Permission.camera;
+    const permission = Permission.camera;
 
     return await permission.status.isPermanentlyDenied;
   }
@@ -61,7 +58,7 @@ class PermissionHandling extends StatelessWidget {
         maxHeight: 1800,
       );
       if (pickedFile != null) {
-        File imageFile = File(pickedFile.path);
+        // File imageFile = File(pickedFile.path);
       }
     } catch (e) {
       var status = await Permission.photos.status;

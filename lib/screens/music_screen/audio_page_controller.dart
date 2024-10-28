@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:external_path/external_path.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../model/music_model.dart';
+import '../../model/music_model.dart';
+import '../../widgets/comman.dart';
 
 class AudioController extends GetxController {
   final AudioPlayer audioPlayer = AudioPlayer(); // Just Audio Player instance
@@ -40,7 +40,7 @@ class AudioController extends GetxController {
       // Fetch only the required number of audio files (e.g., first 50 for display)
       audioFiles.value = await getAllAudioFiles(limit: 1200);
     } else {
-      print("Storage permission denied");
+      logger.w("Storage permission denied");
     }
     isLoading.value = false;
   }
@@ -52,7 +52,7 @@ class AudioController extends GetxController {
       await audioPlayer.setFilePath(audioFiles[index].path);
       await audioPlayer.play();
     } catch (e) {
-      print("Error playing audio: $e");
+      logger.e("Error playing audio: $e");
     }
   }
 
@@ -110,7 +110,7 @@ class AudioController extends GetxController {
     try {
       await audioPlayer.play();
     } catch (e) {
-      print("Error resuming audio: $e");
+      logger.e("Error resuming audio: $e");
     }
   }
 
@@ -119,7 +119,7 @@ class AudioController extends GetxController {
     try {
       await audioPlayer.pause();
     } catch (e) {
-      print("Error pausing audio: $e");
+      logger.w("Error pausing audio : $e");
     }
   }
 
@@ -129,7 +129,7 @@ class AudioController extends GetxController {
       await audioPlayer.stop();
       position.value = Duration.zero;
     } catch (e) {
-      print("Error stopping audio: $e");
+      logger.e("Error stopping audio: $e");
     }
   }
 
@@ -159,8 +159,6 @@ class AudioController extends GetxController {
     if (await externalDir.exists()) {
       await _fetchAudioFiles(externalDir, audioList, limit);
     }
-
-    print("Total audio files found: ${audioList.length} : $externalDir :-$paths");
     return audioList;
   }
 
@@ -174,7 +172,8 @@ class AudioController extends GetxController {
             (entity.path.endsWith(".mp3") ||
                 entity.path.endsWith(".wav") ||
                 entity.path.endsWith(".m4a"))) {
-          audioList.add(AudioFile(path: entity.path, title: basename(entity.path)));
+          String fileName = entity.path.split('/').last;
+          audioList.add(AudioFile(path: entity.path, title: fileName));
 
           if (limit > 0 && audioList.length >= limit) {
             break;
@@ -182,8 +181,7 @@ class AudioController extends GetxController {
         }
       }
     } catch (e) {
-      print("Error fetching files from ${dir.path}: $e");
+      logger.e("Error fetching files from ${dir.path}: $e");
     }
   }
-
 }

@@ -4,19 +4,20 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:s_chat/res/components/chatMessage_box.dart';
-import 'package:s_chat/res/components/round_Textfield.dart';
+import 'package:s_chat/res/components/chat_message_box.dart';
+import 'package:s_chat/res/components/round_text_form_field.dart';
 import 'package:s_chat/services/chat_services/message_sevices.dart';
 
-class MessagePage extends StatefulWidget {
+class ChattingPage extends StatefulWidget {
   final String receiverEmail;
   final String receiverName;
   final String photoURL;
   final String uid;
 
-  const MessagePage(
+  const ChattingPage(
       {super.key,
       required this.receiverEmail,
       required this.uid,
@@ -24,10 +25,10 @@ class MessagePage extends StatefulWidget {
       required this.photoURL});
 
   @override
-  State<MessagePage> createState() => _MessagePageState();
+  State<ChattingPage> createState() => _ChattingPageState();
 }
 
-class _MessagePageState extends State<MessagePage> {
+class _ChattingPageState extends State<ChattingPage> {
   final TextEditingController _messageController = TextEditingController();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final MessageServices _messageServices = MessageServices();
@@ -112,7 +113,7 @@ class _MessagePageState extends State<MessagePage> {
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Text('Loading');
+            return const Text('Loading');
           }
 
           return ListView(
@@ -210,13 +211,9 @@ class _MessagePageState extends State<MessagePage> {
                 onTap: () async {
                   Permission cameraPermission = Permission.camera;
 
-                  print(
-                      'cameraPermission: ${cameraPermission.status.toString()}');
                   inspect(cameraPermission.status.toString());
                   if (await cameraPermission.isDenied) {
                     final result = await cameraPermission.request();
-                    print("result $result");
-
                     if (result.isGranted) {
                       getImage(ImageSource.camera);
                     } else if (result.isDenied) {
@@ -228,12 +225,12 @@ class _MessagePageState extends State<MessagePage> {
                     }
                   } else {
                     openAppSettings();
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    ScaffoldMessenger.of(Get.context!).showSnackBar(
                         // is this context <<<
                         const SnackBar(
                             content: Text('Grant Camera Permission!')));
                   }
-                  Navigator.of(context).pop();
+                  Navigator.of(Get.context!).pop();
                 },
               ),
             ],

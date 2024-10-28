@@ -1,8 +1,11 @@
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:s_chat/screens/home_screens/home_screens.dart';
 import 'package:s_chat/services/notification_service.dart';
+import 'package:s_chat/widgets/comman.dart';
 
+//ignore: must_be_immutable
 class NotificationScreen extends StatefulWidget {
   NotificationScreen({super.key, this.message});
 
@@ -13,24 +16,24 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-
   @override
   void initState() {
     listenToNotifications();
     super.initState();
   }
+
   listenToNotifications() {
-    print("Listening to notification");
     NotificationService.onClickNotification.stream.listen((event) {
-      print(' Listening to notification 11 $event');
+      logger.f(' Listening to notification 11 $event');
       Navigator.pushNamed(context, '/another', arguments: event);
-      Navigator.push(context, MaterialPageRoute(builder: (_)=> const HomeScreen()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => const HomeScreen()));
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    Map payLoad ={};
+    // Map payLoad = {};
     // final data = ModalRoute.of(context)!.settings.arguments as RemoteMessage; //
     // if(data is RemoteMessage){
     //   payLoad = data.data;
@@ -46,23 +49,34 @@ class _NotificationScreenState extends State<NotificationScreen> {
         child: Column(
           children: [
             ElevatedButton(
-                onPressed: () async{
+                onPressed: () async {
                   await NotificationService().requestPermission();
-                  NotificationService.simpleNotification(title: "Test title", body: 'test body', payload: 'test payload');
+                  NotificationService.simpleNotification(
+                      title: "Test title",
+                      body: 'test body',
+                      payload: 'test payload');
                 },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[700]),
-                child: const Text("Notify me",style: TextStyle(color: Colors.white),)),
+                style:
+                    ElevatedButton.styleFrom(backgroundColor: Colors.blue[700]),
+                child: const Text(
+                  "Notify me",
+                  style: TextStyle(color: Colors.white),
+                )),
             ElevatedButton(
-                onPressed: () async{
+                onPressed: () async {
                   await NotificationService().requestPermission();
                   NotificationService.showPeriodicNotification(
                     title: "Periodic Notification",
                     body: "This notification repeats every minute",
                     payload: "periodic_payload",
                   );
-                  },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[700]),
-                child: const Text("Notify me periodically",style: TextStyle(color: Colors.white),)),
+                },
+                style:
+                    ElevatedButton.styleFrom(backgroundColor: Colors.blue[700]),
+                child: const Text(
+                  "Notify me periodically",
+                  style: TextStyle(color: Colors.white),
+                )),
             ElevatedButton.icon(
               icon: const Icon(Icons.timer_outlined),
               onPressed: () {

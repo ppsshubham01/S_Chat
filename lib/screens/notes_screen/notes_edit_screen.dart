@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:s_chat/model/notes_models/noteM.dart';
+import 'package:s_chat/model/notes_models/note_.dart';
 import 'package:s_chat/services/note_services/notes_services.dart';
 
 class NotesEditScreen extends StatefulWidget {
@@ -23,7 +23,7 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
   final NotesServices _notesServices = NotesServices();
 
   void _addressControllerListener() {
-    print(titleController.text);
+    // print(titleController.text);
   }
 
   void saveNotes() {
