@@ -32,7 +32,6 @@ void main() async {
   runApp(MyApp(appTheme: AppTheme()));
 }
 
-/// Initialize Hive database and open required boxes
 Future<void> _initHiveDatabase() async {
   Directory appDocumentDir = await getApplicationDocumentsDirectory();
   Hive.init(appDocumentDir.path);
@@ -41,20 +40,17 @@ Future<void> _initHiveDatabase() async {
   await Hive.openBox('noteBox');
 }
 
-/// Initialize Firebase and Firebase services (FCM, Crashlytics)
 Future<void> _initFirebase() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await FirebaseApi().initializeFirebaseNotifications();
 }
 
-/// Set up native splash screen
 void _setupSplashScreen() {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   FlutterNativeSplash.remove();
 }
 
-/// Set up Crashlytics for handling errors globally
 void _setupCrashlytics() {
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   PlatformDispatcher.instance.onError = (error, stack) {
@@ -63,7 +59,6 @@ void _setupCrashlytics() {
   };
 }
 
-/// Main App widget
 class MyApp extends StatefulWidget {
   final AppTheme? appTheme;
   final navigatorKey = GlobalKey<NavigatorState>();

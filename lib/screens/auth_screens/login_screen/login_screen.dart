@@ -4,7 +4,7 @@ import 'package:s_chat/res/components/round_button.dart';
 import 'package:s_chat/screens/auth_screens/auth_gate/auth_gate_controller.dart';
 
 import '../../../controllers/variable_controller.dart';
-import 'login_screen_controller.dart'; // Import the controller
+import 'login_screen_controller.dart';
 
 class LoginScreen extends GetView<LoginScreenController> {
   const LoginScreen({super.key});
@@ -53,8 +53,7 @@ class LoginScreen extends GetView<LoginScreenController> {
                     title: "Get OTP",
                     onPress: () async {
                       final mobile = phoneController.text.trim();
-                      await controller.registerUser(mobile); // Use the controller to register
-                    },
+                      await controller.registerUser(mobile);                    },
                     width: 110,
                     height: 45,
                     textColor: Colors.white,

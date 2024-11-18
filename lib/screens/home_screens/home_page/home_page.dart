@@ -183,12 +183,12 @@ class HomePage extends GetView<HomeController> {
                 backgroundImage: NetworkImage(
                     data['photoURL'] ?? 'https://source.unsplash.com/random'),
               ),
-              title: Text(data['displayName'] ?? 'Unknown'),
+              title: Text(data['name'] ?? 'Unknown'),
               onTap: () {
                 Get.to(ChattingPage(
                   receiverEmail: data['email'],
                   uid: data['uid'] ?? '',
-                  receiverName: data['displayName'] ?? 'Unknown',
+                  receiverName: data['name'] ?? 'Unknown',
                   photoURL: data['photoURL'] ?? '',
                 ));
               },

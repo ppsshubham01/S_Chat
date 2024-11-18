@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "252105781057",
     "project_id": "mlisflutterbasic",
-    "storage_bucket": "mlisflutterbasic.appspot.com"
+    "storage_bucket": "mlisflutterbasic.firebasestorage.app"
   },
   "client": [
     {
@@ -66,11 +66,11 @@
           }
         },
         {
-          "client_id": "252105781057-40237gerld1pa9m936kfggf8c7pbsksb.apps.googleusercontent.com",
+          "client_id": "252105781057-i4i551tr36tu9vdqlapk68fpm7kgl525.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.s_chat",
-            "certificate_hash": "5f54581601be8fcb23957af629fe2447eb185eb0"
+            "certificate_hash": "4efda6ec6ed834714f8841f6827f3cf200372e87"
           }
         },
         {
