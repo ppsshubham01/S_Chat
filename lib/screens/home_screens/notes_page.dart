@@ -2,14 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:s_chat/model/notes_models/note_.dart';
 import 'package:s_chat/screens/notes_screen/notes_edit_screen.dart';
-import 'package:s_chat/services/hiveDb/database.dart';
 
 import '../../res/components/round_text_form_field.dart';
+import '../../services/database_services.dart';
 
 class NotesPage extends StatefulWidget {
-  final NotesModel? notesModel;
+  final notesModel;
 
   const NotesPage({super.key, this.notesModel});
 
@@ -18,30 +17,20 @@ class NotesPage extends StatefulWidget {
 }
 
 class _NotesPageState extends State<NotesPage> {
-  List<NotesModel> notesOfList = [];
-  final HiveHelperDB hiveHelperDB = HiveHelperDB();
+  List notesOfList = [];
   final ref = FirebaseFirestore.instance
       .collection('notesNoted')
       .doc(FirebaseAuth.instance.currentUser!.uid)
       .collection('nts');
   final TextEditingController searchController = TextEditingController();
 
-  void addOrEditNote(NotesModel notesModel) {
-    setState(() {
-      var existNote = notesOfList.firstWhere(
-        (n) => n.title == notesModel.title,
-      );
-      // orElse: () => NotesModel(id: '', title: '', description: '')); // Avoids null errors
-      if (existNote.title.isEmpty) {
-        notesOfList.add(notesModel); // Adds new note if not found
-      }
-    });
-  }
+  final DatabaseService databaseService = DatabaseService.instance;
 
   @override
   void initState() {
     super.initState();
     fetchAndSetData();
+    databaseService.getNotesData();
   }
 
   void fetchAndSetData() {
@@ -64,11 +53,10 @@ class _NotesPageState extends State<NotesPage> {
         actions: [
           IconButton(
               onPressed: () async {
-                NotesModel finalData = await Navigator.push(
+                var finalData = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) =>
-                            NotesEditScreen(onSave: addOrEditNote)));
+                        builder: (_) => NotesEditScreen(onSave: () {})));
                 setState(() => notesOfList.add(finalData));
               },
               icon: const Icon(Icons.add)),
@@ -101,6 +89,7 @@ class _NotesPageState extends State<NotesPage> {
                 onPressed: () {},
               ),
             ),
+            _notesList(),
             const SizedBox(height: 10),
             Flexible(
               child: StreamBuilder(
@@ -135,8 +124,8 @@ class _NotesPageState extends State<NotesPage> {
                             await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) => NotesEditScreen(
-                                        onSave: addOrEditNote)));
+                                    builder: (_) =>
+                                        NotesEditScreen(onSave: () {})));
                           },
                           trailing: IconButton(
                             onPressed: () {
@@ -264,5 +253,13 @@ class _NotesPageState extends State<NotesPage> {
         ),
       ),
     );
+  }
+
+  Widget _notesList() {
+    return FutureBuilder(
+        future: databaseService.getNotesData(),
+        builder: (context, snapshot) {
+          return Container();
+        });
   }
 }

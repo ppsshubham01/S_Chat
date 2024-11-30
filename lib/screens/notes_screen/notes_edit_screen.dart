@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:s_chat/model/notes_models/note_.dart';
 import 'package:s_chat/services/note_services/notes_services.dart';
 
+import '../../services/database_services.dart';
+
 class NotesEditScreen extends StatefulWidget {
-  final NotesModel? notesModel;
-  final Function(NotesModel) onSave;
+  final notesModel;
+  final Function() onSave;
 
   const NotesEditScreen({super.key, this.notesModel, required this.onSave});
 
@@ -16,11 +17,13 @@ class NotesEditScreen extends StatefulWidget {
 
 class _NotesEditScreenState extends State<NotesEditScreen> {
   TextEditingController titleController = TextEditingController();
-  TextEditingController contentController = TextEditingController();
+  TextEditingController? contentController = TextEditingController(text: '');
   DateTime _lastEditText = DateTime.now();
 
   CollectionReference ref = FirebaseFirestore.instance.collection('notes');
   final NotesServices _notesServices = NotesServices();
+
+  final DatabaseService databaseService = DatabaseService.instance;
 
   void _addressControllerListener() {
     // print(titleController.text);
@@ -29,7 +32,7 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
   void saveNotes() {
     // HiveNotesModel saveNotes = HiveNotesModel(id: DateTime.now().toString(), title: titleController.text, content: contentController.text);
     // setState(() { });
-    if (titleController.text.isNotEmpty && contentController.text.isNotEmpty) {
+    if (titleController.text.isNotEmpty && contentController!.text.isNotEmpty) {
       // final note = NotesModel(
       //     // title: titleController.text, content: contentController.text
       // );
@@ -38,7 +41,7 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
       // Navigator.pop(context, note);
     }
     titleController.clear();
-    contentController.clear();
+    contentController?.clear();
   }
 
   void onTextChange() {
@@ -64,11 +67,9 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
   void dispose() {
     // TODO: implement dispose
     // titleController.removeListener(() {_addressControllerListener(); });
-    contentController.removeListener(onTextChange);
+    contentController?.removeListener(onTextChange);
     super.dispose();
   }
-
-  //******************************Listener Widget use in that for good User interaction************************************
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +78,6 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
     return SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: true,
-        // backgroundColor: Color(0xFF252525),
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(50),
           child: AppBar(
@@ -90,9 +90,7 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
                 child: TextField(
                   controller: titleController,
                   decoration: const InputDecoration(
-                      // helperText: ,
-                      border: InputBorder.none,
-                      hintText: 'Your Title'),
+                      border: InputBorder.none, hintText: 'Your Title'),
                 ),
               ),
             ),
@@ -104,10 +102,8 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
               ),
               IconButton(
                 onPressed: () {
-                  // saveNotes();
                   _notesServices.saveNotesToFireStore(
-                      'id', titleController.text, contentController.text);
-                  Get.back();
+                      'id', titleController.text, contentController!.text);
                   // ref.add({
                   //   'title': titleController.text,
                   //   'content': contentController.text,
@@ -115,6 +111,16 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
                   //   Navigator.pop(context);
                   //   saveNotes();
                   // });
+
+                  // if (contentController == null ||
+                  //     contentController?.text == '') {
+                    databaseService.addTask(contentController.toString());
+                    print("notes data check 11: $contentController");
+                    setState(() {
+                      // contentController == null;
+                    });
+                  // }
+                  Get.back();
                 },
                 icon: const Icon(Icons.save),
                 tooltip: 'More Option',
@@ -134,7 +140,7 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Editing /2 min Ago"),
+                  const Text("Edited 2 min Ago"),
                   Text(_lastEditText.toString())
                 ],
               ),

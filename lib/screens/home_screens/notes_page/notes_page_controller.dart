@@ -2,10 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
-import '../../../model/notes_models/note_.dart';
-
 class NotesController extends GetxController {
-  var notesOfList = <NotesModel>[].obs;
+  var notesOfList = [].obs;
   final ref = FirebaseFirestore.instance
       .collection('notesNoted')
       .doc(FirebaseAuth.instance.currentUser!.uid)
@@ -23,15 +21,6 @@ class NotesController extends GetxController {
     // notesOfList.addAll(tempnoteList);
   }
 
-  void addOrEditNote(NotesModel notesModel) {
-    var existNote = notesOfList.firstWhere(
-          (n) => n.title == notesModel.title,
-      // orElse: () => NotesModel(id: '', title: '', description: ''), // Avoids null errors
-    );
-    if (existNote.title.isEmpty) {
-      notesOfList.add(notesModel); // Adds new note if not found
-    }
-  }
 
   void deleteNote(String noteId) {
     ref.doc(noteId).delete().then((_) {

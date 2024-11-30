@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -6,8 +5,6 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:s_chat/res/theme.dart';
 import 'package:s_chat/screens/auth_screens/auth_gate/auth_gate.dart';
 import 'package:s_chat/screens/auth_screens/auth_gate/auth_gate_controller.dart';
@@ -15,7 +12,6 @@ import 'package:s_chat/services/firebase_api.dart';
 import 'package:s_chat/services/notification_service.dart';
 
 import 'firebase_options.dart';
-import 'model/notes_models/note_.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +19,6 @@ void main() async {
   await NotificationService.init();
   await NotificationService().requestPermission();
 
-  await _initHiveDatabase();
   await _initFirebase();
 
   _setupSplashScreen();
@@ -32,13 +27,6 @@ void main() async {
   runApp(MyApp(appTheme: AppTheme()));
 }
 
-Future<void> _initHiveDatabase() async {
-  Directory appDocumentDir = await getApplicationDocumentsDirectory();
-  Hive.init(appDocumentDir.path);
-  Hive.registerAdapter(NotesModelAdapter());
-  await Hive.initFlutter();
-  await Hive.openBox('noteBox');
-}
 
 Future<void> _initFirebase() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
