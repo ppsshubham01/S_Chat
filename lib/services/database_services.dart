@@ -48,6 +48,6 @@ class DatabaseService {
 
     final db =await database;
     final data = await db.query(_taskTableName);
-    print("notes data check : $data");
+    return null;
   }
 }

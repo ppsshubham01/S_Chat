@@ -3,7 +3,7 @@ import 'package:s_chat/screens/home_screens/home_page/home_page.dart';
 import 'package:s_chat/screens/home_screens/news_page/news_page.dart';
 import 'package:s_chat/screens/home_screens/setting_page/setting_page.dart';
 
-import 'notes_page.dart';
+import 'notes_list_view.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,7 +13,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final ValueNotifier<int> valueNotifier = ValueNotifier(0);
   int _selectedIndex = 0;
 
   void navigateBottomBar(int index) {
@@ -22,43 +21,47 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  final List _pages = const [
+  final List<Widget> _pages = const [
     HomePage(),
     NotesPage(),
     NewsPage(),
     SettingPage(),
   ];
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    debugDumpRenderTree();
-  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          elevation: 2,
-          selectedItemColor: Colors.black,
-          unselectedItemColor: Colors.grey,
-          onTap: (val) {
-            navigateBottomBar(val);
-          },
-          items: const [
-            BottomNavigationBarItem(
-                icon: Icon(Icons.chat_bubble_outline_rounded), label: 'Chat'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.edit_note_sharp), label: 'Notes'),
-            BottomNavigationBarItem(icon: Icon(Icons.newspaper), label: 'news'),
-            BottomNavigationBarItem(
-                icon: CircleAvatar(
-                  backgroundImage:
-                      NetworkImage('https://source.unsplash.com/random'),
-                ),
-                label: 'UserName'),
-          ]),
+        currentIndex: _selectedIndex,
+        elevation: 2,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey,
+        onTap: navigateBottomBar,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_bubble_outline_rounded),
+            label: 'Chat',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.edit_note_sharp),
+            label: 'Notes',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.newspaper),
+            label: 'News',
+          ),
+          BottomNavigationBarItem(
+            icon: CircleAvatar(
+              backgroundImage: NetworkImage(
+                'https://source.unsplash.com/random',
+              ),
+            ),
+            label: 'UserName',
+          ),
+        ],
+      ),
     );
   }
 }
