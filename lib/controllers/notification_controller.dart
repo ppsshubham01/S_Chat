@@ -1,7 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 
-import '../screens/home_screens/home_page.dart';
+import '../screens/home_screens/home_page/home_page.dart';
 import '../services/notification_service.dart';
 
 class NotificationController extends GetxController {

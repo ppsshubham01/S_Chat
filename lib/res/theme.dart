@@ -26,7 +26,7 @@ abstract class _DarkColors {
 }
 
 /// Reference to the application theme.
-  class AppTheme {
+class AppTheme {
   static const accentColor = AppColors.accent;
   static final visualDensity = VisualDensity.adaptivePlatformDensity;
 
@@ -59,7 +59,10 @@ abstract class _DarkColors {
         primaryTextTheme: const TextTheme(
           titleLarge: TextStyle(color: AppColors.textDark),
         ),
-        iconTheme: const IconThemeData(color: AppColors.iconDark), colorScheme: lightBase.colorScheme.copyWith(secondary: accentColor).copyWith(background: _LightColors.background),
+        iconTheme: const IconThemeData(color: AppColors.iconDark),
+        colorScheme: lightBase.colorScheme
+            .copyWith(secondary: accentColor)
+            .copyWith(surface: _LightColors.background),
       );
 
   /// Dark theme and its settings.
@@ -86,6 +89,9 @@ abstract class _DarkColors {
         primaryTextTheme: const TextTheme(
           titleLarge: TextStyle(color: AppColors.textLigth),
         ),
-        iconTheme: const IconThemeData(color: AppColors.iconLight), colorScheme: darkBase.colorScheme.copyWith(secondary: accentColor).copyWith(background: _DarkColors.background),
+        iconTheme: const IconThemeData(color: AppColors.iconLight),
+        colorScheme: darkBase.colorScheme
+            .copyWith(secondary: accentColor)
+            .copyWith(surface: _DarkColors.background),
       );
 }

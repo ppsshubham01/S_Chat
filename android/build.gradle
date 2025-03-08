@@ -6,9 +6,8 @@ buildscript {
     }
 
     dependencies {
-//        classpath 'com.android.tools.build:gradle:7.6.3'
-//        classpath 'com.google.gms:google-services:4.4.1'
-        classpath 'com.android.tools.build:gradle:7.3.1'
+        classpath 'com.android.tools.build:gradle:8.7.3'
+        classpath 'com.google.gms:google-services:4.4.1'
     }
 }
 
@@ -16,6 +15,17 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+    subprojects {
+        afterEvaluate { project ->
+            if (project.hasProperty('android')) {
+                project.android {
+                    if (namespace == null) {
+                        namespace project.group
+                    }
+                }
+            }
+        }
     }
 }
 

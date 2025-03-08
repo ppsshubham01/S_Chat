@@ -1,5 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 
 void showCommaDialog(Widget method) {
   showDialog(
@@ -66,4 +70,40 @@ Widget globalTextUI({
       color: fontColor,
     ),
   );
+}
+
+
+final Logger logger = Logger(printer: PrettyPrinter());
+
+final talker = TalkerFlutter.init(
+  logger: TalkerLogger(
+    settings: TalkerLoggerSettings(
+      colors: {
+        LogLevel.debug: AnsiPen()..green(),
+        LogLevel.info: AnsiPen()..white(),
+        LogLevel.critical: AnsiPen()..red(),
+        LogLevel.error: AnsiPen()..magenta(),
+        LogLevel.warning: AnsiPen()..yellow(),
+        LogLevel.verbose: AnsiPen()..gray(),
+      },
+      // lineSymbol: '~',
+      // maxLineWidth: 70,
+    ),
+    output: (message) {
+      printTalker(message);
+    },
+  ),
+  settings: TalkerSettings(enabled: true),
+);
+
+void printTalker(String text) async {
+  log(text);
+  if (!text.contains("INFO")) {
+    // await Sentry.captureMessage(
+    //   appIsLive
+    //       ? "Live Tenat App - $customerId - $text"
+    //       : "Testing Tenant App - $customerId - $text",
+    //   level: SentryLevel.info,
+    // );
+  }
 }
