@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:s_chat/res/components/round_button.dart';
-import 'package:s_chat/screens/auth_screens/auth_gate/auth_gate_controller.dart';
 
 import '../../../controllers/variable_controller.dart';
+import 'auth_gate_controller.dart';
 import 'login_screen_controller.dart';
 
 class LoginScreen extends GetView<LoginScreenController> {

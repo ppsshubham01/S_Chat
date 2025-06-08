@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
-import '../../../widgets/comman.dart';
-import '../../home_screens/setting_page/setting_page.dart';
+import '../../../widget/comman.dart';
+import '../setting_page/setting_page.dart';
 
 class LoginScreenController extends GetxController {
   // Method to register user with phone number

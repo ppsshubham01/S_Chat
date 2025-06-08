@@ -6,7 +6,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../model/music_model.dart';
-import '../../widgets/comman.dart';
+import '../../widget/comman.dart';
 
 class AudioController extends GetxController {
   final AudioPlayer audioPlayer = AudioPlayer(); // Just Audio Player instance

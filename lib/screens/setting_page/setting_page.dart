@@ -266,9 +266,7 @@ class SettingPage extends GetView<SettingPageController> {
                             Icons.password_sharp, "Password", () {}),
                         buildSettingItem(Icons.privacy_tip_outlined,
                             "Privacy Policy", () {}),
-                        buildSettingItem(
-                            Icons.logout_rounded, "Log Out", () {}),
-                        buildSettingItem(
+                                            buildSettingItem(
                             Icons.contrast_outlined, "Theme", () {}),
                       ],
                     ),

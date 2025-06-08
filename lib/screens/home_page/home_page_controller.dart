@@ -3,7 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-import 'package:s_chat/widgets/comman.dart';
+import 'package:s_chat/widget/comman.dart';
 
 class HomeController extends GetxController {
   final FirebaseAuth auth = FirebaseAuth.instance;

@@ -6,10 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:s_chat/main.dart';
-import 'package:s_chat/screens/notification_page.dart';
-import 'package:s_chat/widgets/comman.dart';
+import 'package:s_chat/widget/comman.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+
+import '../screens/notification_service/notification_page.dart';
 
 class FirebaseApi {
   static FirebaseAuth auth = FirebaseAuth.instance;

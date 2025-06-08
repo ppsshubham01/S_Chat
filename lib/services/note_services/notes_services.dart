@@ -2,24 +2,39 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
-class NotesServices extends GetxController {
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+class EditNotedPageController extends GetxController {
+  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
 
   saveNotesToFireStore(String? id, String title, String content) async {
-    String currentUserID = _firebaseAuth.currentUser!.uid.toString();
+    String currentUserID = firebaseAuth.currentUser!.uid;
     final Timestamp timestamp = Timestamp.now();
-    String ids = currentUserID;
 
-    // NotesModel notesModel = NotesModel(id: id, title: title, description: description)
+    final notesCollection = firestore
+        .collection('notesNoted')
+        .doc(currentUserID)
+        .collection('nts');
 
-    await _firestore.collection('notesNoted').doc(ids).collection('nts').add({
-      'id': id,
-      'title': title,
-      'content': content,
-      'timestamp': timestamp,
-      'currentUserUID': currentUserID,
-    });
-    // .whenComplete(() => Get.back());
+    if (id != null && id.isNotEmpty) {
+      // 🔁 Update existing note
+      await notesCollection.doc(id).update({
+        'title': title,
+        'content': content,
+        'timestamp': timestamp,
+        'currentUserUID': currentUserID,
+      });
+    } else {
+      // 🆕 Create new note
+      DocumentReference newDocRef = notesCollection.doc(); // auto ID
+      await newDocRef.set({
+        'id': newDocRef.id,
+        'title': title,
+        'content': content,
+        'timestamp': timestamp,
+        'currentUserUID': currentUserID,
+      });
+    }
   }
+
 }

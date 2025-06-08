@@ -1,26 +1,33 @@
+// 📁 services/notification_service.dart
+
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest_all.dart' as tz;
 
 class NotificationService {
   static FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-
-  Future<void> requestPermission() async {
-    if (await Permission.notification.isDenied) {
-      await Permission.notification.request();
-    }
-  }
-
   static final onClickNotification = BehaviorSubject<String>();
+  static final FirebaseMessaging _firebaseMessaging =
+      FirebaseMessaging.instance;
 
-  static void onNotificationTap(NotificationResponse notificationResponse) {
-    onClickNotification.add(notificationResponse.payload!);
+  // 💬 Token to manage login/logout
+  static String? _fcmToken;
+
+  /// Request notification permission (for iOS + Android 13+)
+  static Future<void> requestPermission() async {
+    await Permission.notification.request();
+    await _firebaseMessaging.requestPermission();
   }
 
-  static Future init() async {
+  /// Initialize everything (Firebase + Local)
+  static Future<void> init() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
     final DarwinInitializationSettings initializationSettingsDarwin =
@@ -34,91 +41,152 @@ class NotificationService {
             android: initializationSettingsAndroid,
             iOS: initializationSettingsDarwin,
             linux: initializationSettingsLinux);
-    flutterLocalNotificationsPlugin.initialize(
+
+    await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: (details) {},
+      onDidReceiveNotificationResponse: onNotificationTap,
     );
-  }
 
-  /// showing simple notification
-  static Future simpleNotification({
-    required title,
-    required body,
-    required payload,
-  }) async {
-    const AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails('your channel id', 'your channel name',
-            channelDescription: 'your channel description',
-            importance: Importance.max,
-            priority: Priority.high,
-            ticker: 'ticker',
-            sound: RawResourceAndroidNotificationSound('baby'));
-    const NotificationDetails notificationDetails =
-        NotificationDetails(android: androidNotificationDetails);
-    await flutterLocalNotificationsPlugin
-        .show(0, title, body, notificationDetails, payload: payload);
-  }
-
-  /// to show periodic notification at regular interval
-
-  static Future showPeriodicNotification({
-    required title,
-    required body,
-    required payload,
-  }) async {
-    const AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails('repeating channel id', 'your channel name',
-            channelDescription: 'your channel description',
-            importance: Importance.max,
-            priority: Priority.high,
-            ticker: 'ticker',
-            sound: RawResourceAndroidNotificationSound('baby'));
-    const NotificationDetails notificationDetails =
-        NotificationDetails(android: androidNotificationDetails);
-
-    await flutterLocalNotificationsPlugin.periodicallyShow(
-      1,
-      title,
-      body,
-      RepeatInterval.everyMinute,
-      notificationDetails,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-    );
-  }
-
-  // to schedule a local notification
-  static Future showScheduleNotification({
-    required String title,
-    required String body,
-    required String payload,
-  }) async {
     tz.initializeTimeZones();
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-        2,
+
+    // 🟡 Start Listening Firebase Messages
+    // FirebaseMessaging.onMessage.listen(_handleFirebaseMessage);
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessageTap);
+    FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
+  }
+
+  /// Tap notification
+  static void onNotificationTap(NotificationResponse details) {
+    if (details.payload != null) {
+      onClickNotification.add(details.payload!);
+    }
+  }
+
+  /// When app is running
+  static Future<void> _handleFirebaseMessage(RemoteMessage message) async {
+    showSmartNotification(message);
+  }
+
+  /// When app opened from notification
+  static void _handleMessageTap(RemoteMessage message) {
+    if (message.data['uid'] != null) {
+      onClickNotification.add(message.data['uid']);
+    }
+  }
+
+  /// Background handler
+  static Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
+    await showSmartNotification(message);
+  }
+
+  /// Show Notification (Smart Update)
+  // static Future<void> showSmartNotification(RemoteMessage message) async {
+  //   final title = message.notification?.title ?? '';
+  //   final body = message.notification?.body ?? '';
+  //   final payload = message.data['uid'] ?? '';
+  //
+  //   // 🛡️ Use UID's hashCode as notification ID
+  //   int notificationId = payload.hashCode;
+  //
+  //   const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+  //     'chat_channel', 'Chat Notifications',
+  //     channelDescription: 'Channel for chat message notifications',
+  //     importance: Importance.max,
+  //     priority: Priority.high,
+  //     sound: RawResourceAndroidNotificationSound('baby'),
+  //     groupKey: 'com.example.chat',
+  //     playSound: true,
+  //     enableVibration: true,
+  //   );
+  //
+  //   const NotificationDetails notificationDetails = NotificationDetails(android: androidDetails);
+  //
+  //   await flutterLocalNotificationsPlugin.show(
+  //     notificationId,
+  //     title,
+  //     body,
+  //     notificationDetails,
+  //     payload: payload,
+  //   );
+  // }
+
+  static Future<void> showSmartNotification(RemoteMessage message) async {
+    // 🛡️ Ignore if already system notification received
+    if (message.notification == null) {
+      final title = message.data['title'] ?? '';
+      final body = message.data['body'] ?? '';
+      final payload = message.data['uid'] ?? '';
+
+      // 🛡️ Use UID's hashCode as notification ID
+      int notificationId = payload.hashCode;
+
+      const AndroidNotificationDetails androidDetails =
+          AndroidNotificationDetails(
+        'chat_channel', 'Chat Notifications',
+        channelDescription: 'Channel for chat message notifications',
+        importance: Importance.max,
+        priority: Priority.high,
+        sound: RawResourceAndroidNotificationSound('baby'),
+        playSound: true,
+        enableVibration: true,
+        icon: '@mipmap/ic_launcher', // 👈 Added line
+      );
+
+      const NotificationDetails notificationDetails =
+          NotificationDetails(android: androidDetails);
+
+      await flutterLocalNotificationsPlugin.show(
+        notificationId,
         title,
         body,
-        tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5)),
-        const NotificationDetails(
-            android: AndroidNotificationDetails(
-                'channel 3', 'your channel name',
-                channelDescription: 'your channel description',
-                importance: Importance.max,
-                priority: Priority.high,
-                ticker: 'ticker',
-                sound: RawResourceAndroidNotificationSound('baby'))),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-        payload: payload);
+        notificationDetails,
+        payload: payload,
+      );
+    } else {
+      // Agar system notification aayi hai, kuch mat karo
+      print(
+          '🔵 System already showing notification, skipping local notification.');
+    }
   }
 
-  // close a specific channel notification
-  static Future cancel(int id) async {
-    await flutterLocalNotificationsPlugin.cancel(id);
+  /// Subscribe to notification (Login k baad call hoga)
+  static Future<void> subscribeNotification() async {
+    _fcmToken = await _firebaseMessaging.getToken();
+    if (_fcmToken != null) {
+      print("✅ Token saved: 1 $_fcmToken");
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .update({'fcmToken': _fcmToken});
+      print("✅ Token saved: $_fcmToken");
+    }
   }
 
-  // close all the notifications available
+  /// Unsubscribe notifications (Logout k time call hoga)
+  static Future<void> unsubscribeNotification() async {
+    await _firebaseMessaging.deleteToken();
+    _fcmToken = null;
+    print("❌ Token Deleted on logout");
+  }
+
+  /// Cancel all local notifications
   static Future cancelAll() async {
     await flutterLocalNotificationsPlugin.cancelAll();
+  }
+
+  static Future<void> showLocalChatNotification({
+    required String title,
+    required String body,
+    required String uid,
+  }) async {
+    await showSmartNotification(RemoteMessage(
+      notification: RemoteNotification(
+        title: title,
+        body: body,
+      ),
+      data: {
+        'uid': uid,
+      },
+    ));
   }
 }

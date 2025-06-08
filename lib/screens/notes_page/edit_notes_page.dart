@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:s_chat/services/note_services/notes_services.dart';
 
-import '../../../../services/database_services.dart';
 
 
 class NotesEditScreen extends StatefulWidget {
   final QueryDocumentSnapshot? note;
 
-  const NotesEditScreen({Key? key, this.note}) : super(key: key);
+  const NotesEditScreen({super.key, this.note});
 
   @override
   State<NotesEditScreen> createState() => _NotesEditScreenState();
@@ -18,7 +17,7 @@ class NotesEditScreen extends StatefulWidget {
 class _NotesEditScreenState extends State<NotesEditScreen> {
   late TextEditingController titleController;
   late TextEditingController contentController;
-  final NotesServices _notesServices = NotesServices();
+  final EditNotedPageController editNotedPageController = EditNotedPageController();
 
   @override
   void initState() {
@@ -29,14 +28,15 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
 
   void saveNote() {
     if (titleController.text.isNotEmpty && contentController.text.isNotEmpty) {
-      _notesServices.saveNotesToFireStore(
-        widget.note?.id ?? '',
+      editNotedPageController.saveNotesToFireStore(
+        widget.note?['id'],
         titleController.text,
         contentController.text,
       );
+      Get.back();
     }
-    Get.back();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,14 @@ class _NotesEditScreenState extends State<NotesEditScreen> {
         backgroundColor: Colors.green,
         title: TextField(
           controller: titleController,
-          decoration: const InputDecoration(border: InputBorder.none, hintText: 'Your Title'),
+          style: TextStyle(color: Colors.indigo[900]),
+          cursorColor: Colors.indigo[900],
+          decoration: const InputDecoration(
+            border: InputBorder.none,
+            hintText: 'Your Title',
+            hintStyle: TextStyle(color: Colors.grey), // optional
+          ),
+          autofocus: true,
         ),
         actions: [
           IconButton(onPressed: saveNote, icon: const Icon(Icons.save)),

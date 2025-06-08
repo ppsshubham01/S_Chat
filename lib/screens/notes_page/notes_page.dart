@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 
 import '../../res/components/round_text_form_field.dart';
 import '../../services/database_services.dart';
-import 'notes_page/notes_screen/notes_edit_screen.dart';
+import 'edit_notes_page.dart';
 
 class NotesPage extends StatefulWidget {
   const NotesPage({super.key});
@@ -94,16 +94,16 @@ class _NotesPageState extends State<NotesPage> {
                     physics: const BouncingScrollPhysics(),
                     itemCount: snapshots.data?.docs.length ?? 0,
                     itemBuilder: (_, index) {
-                      final note = snapshots.data?.docs[index];
+                      final notesIndex = snapshots.data?.docs[index];
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ListTile(
                           title: Text(
-                            note?['title'] ?? '',
+                            notesIndex?['title'] ?? '',
                             overflow: TextOverflow.ellipsis,
                           ),
                           subtitle: Text(
-                            note?['content'] ?? '',
+                            notesIndex?['content'] ?? '',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -112,10 +112,10 @@ class _NotesPageState extends State<NotesPage> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           onTap: () {
-                            Get.to(() => NotesEditScreen(note: note));
+                            Get.to(() => NotesEditScreen(note: notesIndex));
                           },
                           trailing: IconButton(
-                            onPressed: () => _showDeleteDialog(context, note),
+                            onPressed: () => _showDeleteDialog(context, notesIndex),
                             icon: const Icon(Icons.delete, color: Colors.red),
                           ),
                         ),

@@ -7,9 +7,9 @@ import 'package:get/get.dart';
 import 'package:s_chat/screens/allusers.dart';
 import 'package:s_chat/screens/chat_screens/chating_page/chating_page.dart';
 import 'package:s_chat/screens/music_screen/audio_page.dart';
-import 'package:s_chat/screens/notification_page.dart';
 
-import '../../../widgets/comman.dart';
+import '../../../widget/comman.dart';
+import '../notification_service/notification_page.dart';
 import 'home_page_controller.dart';
 
 class HomePage extends GetView<HomeController> {

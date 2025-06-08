@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:s_chat/model/chats_models/message_model.dart';
-import 'package:s_chat/widgets/comman.dart';
+import 'package:s_chat/widget/comman.dart';
 
 class MessageServices extends GetxController {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;

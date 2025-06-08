@@ -5,19 +5,19 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
+import 'package:s_chat/controllers/variable_controller.dart';
 import 'package:s_chat/res/theme.dart';
-import 'package:s_chat/screens/auth_screens/auth_gate/auth_gate.dart';
-import 'package:s_chat/screens/auth_screens/auth_gate/auth_gate_controller.dart';
+import 'package:s_chat/screens/auth_screens/auth_gate_controller.dart';
 import 'package:s_chat/services/firebase_api.dart';
 import 'package:s_chat/services/notification_service.dart';
 
 import 'firebase_options.dart';
+import 'screens/auth_screens/auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await NotificationService.init();
-  await NotificationService().requestPermission();
 
   await _initFirebase();
 
@@ -26,7 +26,6 @@ void main() async {
 
   runApp(MyApp(appTheme: AppTheme()));
 }
-
 
 Future<void> _initFirebase() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -39,8 +38,10 @@ void _setupSplashScreen() {
   FlutterNativeSplash.remove();
 }
 
-void _setupCrashlytics() {
+void _setupCrashlytics() async {
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+// Add global error catcher for better Crashlytics
   PlatformDispatcher.instance.onError = (error, stack) {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     return true;
@@ -63,6 +64,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     Get.put(AuthGateController());
+    Get.put(VariableController());
     return GetMaterialApp(
       navigatorKey: widget.navigatorKey,
       debugShowCheckedModeBanner: false,

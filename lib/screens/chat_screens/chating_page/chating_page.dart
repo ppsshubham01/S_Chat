@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,35 +10,88 @@ import 'package:s_chat/res/components/chat_message_box.dart';
 import 'package:s_chat/res/components/round_text_form_field.dart';
 import 'package:s_chat/services/chat_services/message_sevices.dart';
 
+import '../../../services/notification_service.dart';
+
 class ChattingPage extends StatefulWidget {
   final String receiverEmail;
   final String receiverName;
   final String photoURL;
   final String uid;
 
-  const ChattingPage(
-      {super.key,
-      required this.receiverEmail,
-      required this.uid,
-      required this.receiverName,
-      required this.photoURL});
+  const ChattingPage({
+    super.key,
+    required this.receiverEmail,
+    required this.uid,
+    required this.receiverName,
+    required this.photoURL,
+  });
 
   @override
-  State<ChattingPage> createState() => _ChattingPageState();
+  State<ChattingPage> createState() => ChattingPageState();
 }
 
-class _ChattingPageState extends State<ChattingPage> {
-  final TextEditingController _messageController = TextEditingController();
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  final MessageServices _messageServices = MessageServices();
+class ChattingPageState extends State<ChattingPage> {
+  TextEditingController messageController = TextEditingController();
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  MessageServices messageServices = MessageServices();
+  ScrollController scrollController = ScrollController();
+
   File? galleryFile;
-  final picker = ImagePicker();
+  ImagePicker picker = ImagePicker();
 
   void sendMessage() async {
-    if (_messageController.text.isNotEmpty) {
-      await _messageServices.sendMessage(
-          widget.uid, _messageController.text, widget.receiverName);
-      _messageController.clear();
+    if (messageController.text.isNotEmpty) {
+        await messageServices.sendMessage(
+          widget.uid,
+          messageController.text.trim(),
+          widget.receiverName,
+        );
+
+      await NotificationService.showLocalChatNotification(
+        title: widget.receiverName,
+        body: messageController.text.trim(),
+        uid: widget.uid,
+      );
+      messageController.clear();
+      scrollToBottom();
+    }
+  }
+
+  // void sendMessage() async {
+  //   if (messageController.text.isNotEmpty) {
+  //     // 📩 Send the message to Firebase
+  //     await messageServices.sendMessage(
+  //       widget.uid,
+  //       messageController.text.trim(),
+  //       widget.receiverName,
+  //     );
+  //
+  //     // 🛎 Send Local Notification (For own testing)
+  //     await NotificationService.showSmartNotification(
+  //       RemoteMessage(
+  //         notification: RemoteNotification(
+  //           title: widget.receiverName,
+  //           body: messageController.text.trim(),
+  //         ),
+  //         data: {
+  //           'uid': widget.uid,
+  //         },
+  //       ),
+  //     );
+  //
+  //     // 🎯 Clear message input and scroll
+  //     messageController.clear();
+  //     scrollToBottom();
+  //   }
+  // }
+
+  void scrollToBottom() {
+    if (scrollController.hasClients) {
+      scrollController.animateTo(
+        scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
     }
   }
 
@@ -48,43 +100,40 @@ class _ChattingPageState extends State<ChattingPage> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-          title: Text(
-            widget.receiverEmail,
-            overflow: TextOverflow.ellipsis,
+        title: Text(
+          widget.receiverEmail,
+          overflow: TextOverflow.ellipsis,
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.exit_to_app_outlined),
+            onPressed: () {
+              exit(0);
+            },
           ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: IconButton(
-                icon: const Icon(Icons.exit_to_app_outlined),
-                onPressed: () {
-                  exit(0);
-                },
-                tooltip: 'Exit App',
-              ),
-            ),
-          ]),
+        ],
+      ),
       drawer: Drawer(
         child: ListView(
           children: <Widget>[
             UserAccountsDrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.deepPurple[900],
-              ),
+              decoration: BoxDecoration(color: Colors.deepPurple[900]),
               accountName: Text(widget.receiverName),
               accountEmail: Text(widget.receiverEmail),
               currentAccountPicture: CircleAvatar(
                 backgroundImage: NetworkImage(widget.photoURL),
               ),
-              onDetailsPressed: () {},
             ),
             ListTile(
               leading: const Icon(Icons.delete),
-              title: const Text("delete"),
-              subtitle: const Text("Delete chat from of this account"),
+              title: const Text("Delete"),
+              subtitle: const Text("Delete chat from this account"),
               onTap: () async {
-                _messageServices.deleteMessages(widget.uid,
-                    _firebaseAuth.currentUser!.uid, widget.receiverName);
+                await messageServices.deleteMessages(
+                  widget.uid,
+                  firebaseAuth.currentUser!.uid,
+                  widget.receiverName,
+                );
               },
             ),
           ],
@@ -92,64 +141,64 @@ class _ChattingPageState extends State<ChattingPage> {
       ),
       body: Column(
         children: [
-          //message
-          Expanded(child: _buildMessageList()),
-          //userInput
-          _buildMessageInput(),
+          Expanded(child: buildMessageList()),
+          buildMessageInput(),
         ],
       ),
-      // bottomNavigationBar: _buildMessageInput(),
     );
   }
 
-  //build message list
-  Widget _buildMessageList() {
+  Widget buildMessageList() {
     return StreamBuilder(
-        stream: _messageServices.getMessages(
-            widget.uid, _firebaseAuth.currentUser!.uid, widget.receiverName),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          }
+      stream: messageServices.getMessages(
+        widget.uid,
+        firebaseAuth.currentUser!.uid,
+        widget.receiverName,
+      ),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
 
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Text('Loading');
-          }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Text('Loading...');
+        }
 
-          return ListView(
-            children: snapshot.data!.docs
-                .map((document) => _buildMessageItem(document))
-                .toList(),
-          );
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          scrollToBottom();
         });
+
+        return ListView(
+          controller: scrollController,
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          children: snapshot.data!.docs
+              .map((document) => buildMessageItem(document))
+              .toList(),
+        );
+      },
+    );
   }
 
-  // build message item
-  Widget _buildMessageItem(DocumentSnapshot documentSnapshot) {
+  Widget buildMessageItem(DocumentSnapshot documentSnapshot) {
     Map<String, dynamic> data = documentSnapshot.data() as Map<String, dynamic>;
 
-    var alignment = (data['SenderId'] == _firebaseAuth.currentUser!.uid)
-        ? Alignment.centerRight
-        : Alignment.centerLeft;
+    var isSender = data['SenderId'] == firebaseAuth.currentUser!.uid;
+
+    var alignment = isSender ? Alignment.centerRight : Alignment.centerLeft;
+    var crossAxis =
+        isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start;
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
         alignment: alignment,
         child: Column(
-          crossAxisAlignment:
-              (data['SenderId'] == _firebaseAuth.currentUser!.uid)
-                  ? CrossAxisAlignment.end
-                  : CrossAxisAlignment.start,
-          mainAxisAlignment:
-              (data['SenderId'] == _firebaseAuth.currentUser!.uid)
-                  ? MainAxisAlignment.end
-                  : MainAxisAlignment.start,
+          crossAxisAlignment: crossAxis,
           children: [
-            // Text(data['SenderEmail']),
-            Text(data['SenderName'].split(' ').first ??
-                'Unknown'), //isuuue on Name display
-
+            Text(
+              (data['SenderName']?.split(' ').first ?? 'Unknown'),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+            ),
             ChatMessageBox(message: data['message']),
           ],
         ),
@@ -157,43 +206,40 @@ class _ChattingPageState extends State<ChattingPage> {
     );
   }
 
-  //build message input
-  Widget _buildMessageInput() {
+  Widget buildMessageInput() {
     return Container(
       color: Colors.greenAccent,
       child: Row(
         children: [
           Expanded(
-              child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: RoundTextField(
-              textbackgroundColor: Colors.transparent,
-              onPressed: () {},
-              controller: _messageController,
-              hintText: 'Enter Message',
-              obscureText: false,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: RoundTextField(
+                textbackgroundColor: Colors.transparent,
+                onPressed: () {},
+                controller: messageController,
+                hintText: 'Enter Message',
+                obscureText: false,
+              ),
             ),
-          )),
+          ),
           IconButton(
-              onPressed: () {
-                // PermissionHandling().requestPermission();
-                _showPicker(context: context);
-              },
-              icon: const Icon(Icons.camera_alt_outlined)),
+            icon: const Icon(Icons.camera_alt_outlined),
+            onPressed: () => showPicker(context: context),
+          ),
           IconButton(
-              onPressed: sendMessage,
-              icon: const Icon(Icons.arrow_upward_sharp))
+            icon: const Icon(Icons.arrow_upward_sharp),
+            onPressed: sendMessage,
+          ),
         ],
       ),
     );
   }
 
-  void _showPicker({
-    required BuildContext context,
-  }) {
+  void showPicker({required BuildContext context}) {
     showModalBottomSheet(
       context: context,
-      builder: (BuildContext context) {
+      builder: (_) {
         return SafeArea(
           child: Wrap(
             children: <Widget>[
@@ -211,25 +257,17 @@ class _ChattingPageState extends State<ChattingPage> {
                 onTap: () async {
                   Permission cameraPermission = Permission.camera;
 
-                  inspect(cameraPermission.status.toString());
                   if (await cameraPermission.isDenied) {
-                    final result = await cameraPermission.request();
+                    var result = await cameraPermission.request();
                     if (result.isGranted) {
                       getImage(ImageSource.camera);
-                    } else if (result.isDenied) {
+                    } else {
                       openAppSettings();
-                    } else if (result.isPermanentlyDenied) {
-                      // openAppSettings();
-                      // ScaffoldMessenger.of(context).showSnackBar(// is this context <<<
-                      //     const SnackBar(content: Text('permission is selected')));
                     }
                   } else {
-                    openAppSettings();
-                    ScaffoldMessenger.of(Get.context!).showSnackBar(
-                        // is this context <<<
-                        const SnackBar(
-                            content: Text('Grant Camera Permission!')));
+                    getImage(ImageSource.camera);
                   }
+
                   Navigator.of(Get.context!).pop();
                 },
               ),
@@ -240,22 +278,17 @@ class _ChattingPageState extends State<ChattingPage> {
     );
   }
 
-  Future getImage(
-    ImageSource img,
-  ) async {
+  Future getImage(ImageSource img) async {
     final pickedFile = await picker.pickImage(source: img);
-    XFile? xfilePick = pickedFile;
-    setState(
-      () {
-        if (xfilePick != null) {
-          galleryFile = File(pickedFile!.path);
-          ScaffoldMessenger.of(context).showSnackBar(// is this context <<<
-              const SnackBar(content: Text('Is selected')));
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(// is this context <<<
-              const SnackBar(content: Text('Nothing is selected')));
-        }
-      },
-    );
+    if (pickedFile != null) {
+      galleryFile = File(pickedFile.path);
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(content: Text('Image selected')),
+      );
+    } else {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(content: Text('Nothing selected')),
+      );
+    }
   }
 }
