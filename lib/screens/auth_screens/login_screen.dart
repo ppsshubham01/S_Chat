@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:s_chat/res/components/round_button.dart';
 
-import '../../../controllers/variable_controller.dart';
 import 'auth_gate_controller.dart';
 import 'login_screen_controller.dart';
 
@@ -11,8 +9,7 @@ class LoginScreen extends GetView<LoginScreenController> {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController phoneController = TextEditingController();
-    final VariableController variableController = Get.put(VariableController());
+    // final VariableController variableController = Get.put(VariableController());
 
     return SafeArea(
       child: Scaffold(
@@ -33,39 +30,43 @@ class LoginScreen extends GetView<LoginScreenController> {
                   "Welcome Back Home\n it's Dad's Home..You've been missed!",
                   style: TextStyle(fontSize: 22, color: Colors.black45),
                 ),
-                const SizedBox(height: 15),
-                TextFormField(
-                  decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    hintText: 'Enter Phone Number',
-                  ),
-                  controller: phoneController,
-                ),
-                const SizedBox(height: 10),
-                Center(
-                  child: RoundButton(
-                    title: "Get OTP",
-                    onPress: () async {
-                      final mobile = phoneController.text.trim();
-                      await controller.registerUser(mobile);                    },
-                    width: 110,
-                    height: 45,
-                    textColor: Colors.white,
-                    buttonColor: Colors.black,
-                  ),
-                ),
+                // const SizedBox(height: 15),
+                // TextFormField(
+                //   decoration: InputDecoration(
+                //     enabledBorder: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(12),
+                //     ),
+                //     focusedBorder: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(12),
+                //       borderSide: const BorderSide(color: Colors.grey),
+                //     ),
+                //     hintText: 'Enter Phone Number',
+                //   ),
+                //   controller: phoneController,
+                // ),
+                // const SizedBox(height: 10),
+                // Center(
+                //   child: RoundButton(
+                //     title: "Get OTP",
+                //     onPress: () async {
+                //       final mobile = phoneController.text.trim();
+                //       await controller.registerUser(mobile);
+                //     },
+                //     width: 110,
+                //     height: 45,
+                //     textColor: Colors.white,
+                //     buttonColor: Colors.black,
+                //   ),
+                // ),
                 const SizedBox(height: 10),
                 const Divider(thickness: 3),
                 Center(
-                  child: variableController.isLoading.value
-                      ? const CircularProgressIndicator()
-                      : IconButton(
+                  child:
+                  
+                      // variableController.isLoading.value
+                      //     ? const CircularProgressIndicator()
+                      //     :
+                      IconButton(
                     onPressed: () {
                       AuthGateController().signInWithGoogle();
                     },

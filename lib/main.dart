@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:s_chat/controllers/variable_controller.dart';
 import 'package:s_chat/res/theme.dart';
@@ -13,15 +12,16 @@ import 'package:s_chat/services/notification_service.dart';
 
 import 'firebase_options.dart';
 import 'screens/auth_screens/auth_gate.dart';
+import 'utils/hive_helper_db.dart';
+import 'utils/user_data_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await NotificationService.init();
+  await HiveHelperDB.init();
 
   await _initFirebase();
-
-  _setupSplashScreen();
   _setupCrashlytics();
 
   runApp(MyApp(appTheme: AppTheme()));
@@ -30,12 +30,6 @@ void main() async {
 Future<void> _initFirebase() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await FirebaseApi().initializeFirebaseNotifications();
-}
-
-void _setupSplashScreen() {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  FlutterNativeSplash.remove();
 }
 
 void _setupCrashlytics() async {
@@ -64,7 +58,9 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     Get.put(AuthGateController());
-    Get.put(VariableController());
+    // Get.put(VariableController());
+    Get.put(UserDataManager());
+
     return GetMaterialApp(
       navigatorKey: widget.navigatorKey,
       debugShowCheckedModeBanner: false,

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import 'setting_page_controller.dart';
 
+
 class SettingPage extends GetView<SettingPageController> {
   const SettingPage({super.key});
 
@@ -17,7 +18,10 @@ class SettingPage extends GetView<SettingPageController> {
             backgroundColor: Colors.black26,
             title: const Text('Typography'),
             actions: [
-              DropdownButton(
+              Obx(() => DropdownButton(
+                value: controller.dropdownValue.value.isEmpty
+                    ? null
+                    : controller.dropdownValue.value,
                 items: [
                   DropdownMenuItem(
                     value: '0',
@@ -26,20 +30,17 @@ class SettingPage extends GetView<SettingPageController> {
                         CircleAvatar(
                           radius: 20,
                           backgroundImage: NetworkImage(
-                              controller.user.value?.photoURL ??
+                              controller.userData['photoURL'] ??
                                   'https://source.unsplash.com/random'),
                         ),
                         const SizedBox(width: 3),
-                        Text(controller.user.value?.displayName
-                                ?.split(' ')
-                                .first ??
-                            'No Name is there'),
+                        Text(controller.userData['name']?.split(' ').first ??
+                            'No Name'),
                       ],
                     ),
                   ),
-                  // Duplicate DropdownMenuItem can be removed for better UI.
                   const DropdownMenuItem(
-                    value: Text('data'),
+                    value: 'add',
                     child: Row(
                       children: [
                         Icon(Icons.add),
@@ -54,82 +55,27 @@ class SettingPage extends GetView<SettingPageController> {
                 },
                 iconSize: 32,
                 borderRadius: BorderRadius.circular(22),
-              ),
+              )),
               const SizedBox(width: 5),
               IconButton(
                 tooltip: 'Log Out',
                 onPressed: () {
                   Get.dialog(
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 40),
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20)),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Material(
-                                child: Column(
-                                  children: [
-                                    const SizedBox(height: 10),
-                                    const Text("Are You Sure?",
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(fontSize: 30)),
-                                    const SizedBox(height: 15),
-                                    const Text(
-                                        "Do you really want to Sign out Your current account?\nYou will not able to undo this action!",
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(fontSize: 15)),
-                                    const SizedBox(height: 20),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                              foregroundColor:
-                                                  const Color(0xFFBD6969),
-                                              minimumSize: const Size(0, 45),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                            ),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text('NO'),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                          child: ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                              foregroundColor:
-                                                  const Color(0xFFBD6969),
-                                              minimumSize: const Size(0, 45),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                            ),
-                                            onPressed: () {
-                                              controller.signOut();
-                                            },
-                                            child: const Text('YES'),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
+                    AlertDialog(
+                      title: const Text("Are You Sure?"),
+                      content: const Text(
+                          "Do you really want to sign out your current account?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('NO'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            controller.signOut();
+                          },
+                          child: const Text('YES'),
                         ),
                       ],
                     ),
@@ -139,139 +85,111 @@ class SettingPage extends GetView<SettingPageController> {
               ),
             ],
           ),
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
+          body: Obx(
+                () => SingleChildScrollView(
+              padding: const EdgeInsets.all(8),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
+                children: [
                   Stack(
                     children: [
                       Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(11)),
                         height: 130,
                         width: double.infinity,
-                        child: Image.network(
-                            'https://source.unsplash.com/random',
-                            fit: BoxFit.fill),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(11),
+                          image: DecorationImage(
+                            image: NetworkImage(controller.userData['photoURL'] ??
+                                'https://source.unsplash.com/random'),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       ),
                       Column(
                         children: [
                           const SizedBox(height: 80),
-                          CircleAvatar(
-                            radius: 70,
-                            backgroundColor: Colors.grey,
-                            child: GestureDetector(
-                              onTap: () {
-                                Get.dialog(
-                                  useSafeArea: true,
-                                  barrierDismissible: true,
-                                  Container(
-                                    margin: const EdgeInsets.all(22),
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    child: Image.network(
-                                      controller.user.value?.photoURL ??
-                                          'https://source.unsplash.com/random',
-                                      fit: BoxFit.contain,
-                                    ),
+                          GestureDetector(
+                            onTap: () {
+                              // View profile photo full screen
+                              Get.dialog(
+                                Center(
+                                  child: Image.network(
+                                    controller.userData['photoURL'] ??
+                                        'https://source.unsplash.com/random',
                                   ),
-                                );
-                              },
-                              child: CircleAvatar(
-                                radius: 65,
-                                backgroundImage: NetworkImage(
-                                    controller.user.value?.photoURL ??
-                                        'https://source.unsplash.com/random'),
-                              ),
+                                ),
+                              );
+                            },
+                            child: CircleAvatar(
+                              radius: 70,
+                              backgroundImage: NetworkImage(
+                                  controller.userData['photoURL'] ??
+                                      'https://source.unsplash.com/random'),
                             ),
                           ),
                           const SizedBox(height: 5),
-                          Center(
-                              child: Text(controller.user.value?.displayName ??
-                                  'No Name is there')),
-                          Center(
-                              child: Text(controller.user.value?.email ??
-                                  'No email is there')),
+                          Text(controller.userData['name'] ?? 'No Name'),
+                          Text(controller.userData['email'] ?? 'No Email'),
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              // Edit name
+                              Get.defaultDialog(
+                                title: 'Edit Name',
+                                content: TextField(
+                                  controller: TextEditingController(
+                                      text: controller.userData['name']),
+                                  onChanged: (val) {
+                                    controller.updateUserName(val);
+                                  },
+                                  decoration:
+                                  const InputDecoration(labelText: 'Name'),
+                                ),
+                                confirm: TextButton(
+                                  onPressed: () {
+                                    Get.back();
+                                  },
+                                  child: const Text('SAVE'),
+                                ),
+                              );
+                            },
+                          ),
                         ],
                       ),
-                      Positioned(
-                        bottom: 30,
-                        right: 172,
-                        child: IconButton(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Tapped Success')));
-                          },
-                          color: Colors.red,
-                          icon: GestureDetector(
-                            onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text(
-                                          'Tapped Success for Edit option!')));
-                            },
-                            child: const CircleAvatar(
-                              backgroundColor: Colors.white24,
-                              child: Icon(Icons.edit, color: Colors.black),
-                            ),
-                          ),
-                        ),
-                      )
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      const Text("Profile",
-                          style:
-                              TextStyle(color: Colors.lightBlue, fontSize: 20)),
-                      IconButton(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Tapped Success')));
-                        },
-                        color: Colors.black38,
-                        icon: const Icon(Icons.edit),
-                      )
+                  const SizedBox(height: 20),
+                  // Settings Sections
+                  buildSection(
+                    title: 'Profile Settings',
+                    items: [
+                      buildSettingItem(
+                        icon: Icons.perm_identity_outlined,
+                        title: "Personal Data",
+                        onTap: () {},
+                      ),
+                      buildSettingItem(
+                        icon: Icons.language_outlined,
+                        title: "Language",
+                        onTap: () {},
+                      ),
                     ],
                   ),
-                  Container(
-                    color: Colors.black26,
-                    child: Column(
-                      children: [
-                        buildSettingItem(Icons.perm_identity_outlined,
-                            "Personal Data", () {}),
-                        buildSettingItem(
-                            Icons.language_outlined, "Language", () {}),
-                        buildSettingItem(
-                            Icons.notifications, "Notification", () {}),
-                        buildSettingItem(
-                            Icons.contrast_outlined, "Theme", () {}),
-                      ],
-                    ),
+                  const SizedBox(height: 10),
+                  buildSection(
+                    title: 'Security',
+                    items: [
+                      buildSettingItem(
+                        icon: Icons.password_sharp,
+                        title: "Password",
+                        onTap: () {},
+                      ),
+                      buildSettingItem(
+                        icon: Icons.privacy_tip_outlined,
+                        title: "Privacy Policy",
+                        onTap: () {},
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 5),
-                  const Text("Security",
-                      style: TextStyle(color: Colors.lightBlue, fontSize: 20)),
-                  const SizedBox(height: 5),
-                  Container(
-                    color: Colors.black26,
-                    child: Column(
-                      children: [
-                        buildSettingItem(
-                            Icons.password_sharp, "Password", () {}),
-                        buildSettingItem(Icons.privacy_tip_outlined,
-                            "Privacy Policy", () {}),
-                                            buildSettingItem(
-                            Icons.contrast_outlined, "Theme", () {}),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 5),
                 ],
               ),
             ),
@@ -281,7 +199,24 @@ class SettingPage extends GetView<SettingPageController> {
     );
   }
 
-  Widget buildSettingItem(IconData icon, String title, VoidCallback onTap) {
+  Widget buildSection({required String title, required List<Widget> items}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: const TextStyle(color: Colors.lightBlue, fontSize: 20)),
+        Container(
+          color: Colors.black26,
+          child: Column(children: items),
+        ),
+      ],
+    );
+  }
+
+  Widget buildSettingItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: InkWell(

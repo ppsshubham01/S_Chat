@@ -7,50 +7,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:252105781057:android:19ec5e8ebd33979fcffbc0",
-        "android_client_info": {
-          "package_name": "com.example.mlit_basic_flutter"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "252105781057-ds9mc6gkn7o7cuhnpv0jjoki757u1hbt.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.mlit_basic_flutter",
-            "certificate_hash": "985a65ea0344c17cfbdeb5cd64f588d75d8d4d7f"
-          }
-        },
-        {
-          "client_id": "252105781057-7pcmfd5l8lc2p1lfkp12ueje5f57p7uu.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBif29K1gHH_YNmkt1HVuvyWzSQTc17EAg"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "252105781057-7pcmfd5l8lc2p1lfkp12ueje5f57p7uu.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "252105781057-2rstpvp0p4bqlp2vikjsnimt53pm8bvq.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.sChat"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:252105781057:android:4b0e36ffed770260cffbc0",
         "android_client_info": {
           "package_name": "com.example.s_chat"
@@ -58,19 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "252105781057-0941n15qb2m4d6jsg26b0na7md46hjc7.apps.googleusercontent.com",
+          "client_id": "252105781057-bcorc52uqggdqi0fbktq18q9r6s0dr56.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.s_chat",
-            "certificate_hash": "d3237b4487724782e8336615746b282d3397b887"
-          }
-        },
-        {
-          "client_id": "252105781057-i4i551tr36tu9vdqlapk68fpm7kgl525.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.s_chat",
-            "certificate_hash": "4efda6ec6ed834714f8841f6827f3cf200372e87"
+            "certificate_hash": "43ba6676ce2fa28408aa2ee5405a764687cb1160"
           }
         },
         {

@@ -24,69 +24,63 @@ class HomePage extends GetView<HomeController> {
       brightness: controller.isDark.value ? Brightness.dark : Brightness.light,
     );
 
-    return MaterialApp(
-      theme: themeData,
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 15,
-          title: const Text(' ¯_ツ_¯'),
-          actions: [
-            IconButton(
-              onPressed: () => Get.to(const AudioPage()),
-              icon: const Icon(Icons.music_note_outlined),
-            ),
-            IconButton(
-              onPressed: () => navigateToTakePictureScreen(),
-              icon: const Icon(Icons.camera_alt_outlined),
-            ),
-            IconButton(
-              onPressed: () => Get.to(NotificationScreen()),
-              icon: const Icon(Icons.notifications),
-            ),
-            PopupMenuButton<String>(
-              onSelected: (value) {
-                logger.e("values $value");
-              },
-              itemBuilder: (BuildContext context) {
-                return [
-                  const PopupMenuItem(
-                      value: "New group", child: Text("New group")),
-                  const PopupMenuItem(
-                      value: "New broadcast", child: Text("New broadcast")),
-                  const PopupMenuItem(
-                      value: "Whatsapp Web", child: Text("Whatsapp Web")),
-                  const PopupMenuItem(
-                      value: "Starred messages",
-                      child: Text("Starred messages")),
-                  const PopupMenuItem(
-                      value: "Settings", child: Text("Settings")),
-                ];
-              },
-            ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildSearchBar(),
-                _buildUserList(),
-              ],
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 15,
+        title: const Text(' ¯_ツ_¯'),
+        actions: [
+          IconButton(
+            onPressed: () => Get.to(const AudioPage()),
+            icon: const Icon(Icons.music_note_outlined),
+          ),
+          IconButton(
+            onPressed: () => navigateToTakePictureScreen(),
+            icon: const Icon(Icons.camera_alt_outlined),
+          ),
+          IconButton(
+            onPressed: () => Get.to(NotificationScreen()),
+            icon: const Icon(Icons.notifications),
+          ),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              logger.e("values $value");
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                const PopupMenuItem(
+                    value: "New group", child: Text("New group")),
+                const PopupMenuItem(
+                    value: "New broadcast", child: Text("New broadcast")),
+                const PopupMenuItem(
+                    value: "Whatsapp Web", child: Text("Whatsapp Web")),
+                const PopupMenuItem(
+                    value: "Starred messages", child: Text("Starred messages")),
+                const PopupMenuItem(value: "Settings", child: Text("Settings")),
+              ];
+            },
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSearchBar(),
+              _buildUserList(),
+            ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.white12,
-          elevation: 0,
-          onPressed: () {
-            Get.to(() => const AllUsers());
-          },
-          child: const Icon(Icons.contact_page_outlined),
-        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.white12,
+        elevation: 0,
+        onPressed: () {
+          Get.to(() => const AllUsers());
+        },
+        child: const Icon(Icons.contact_page_outlined),
       ),
     );
   }

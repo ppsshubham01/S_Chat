@@ -147,18 +147,18 @@ class AudioController extends GetxController {
   static Future<List<AudioFile>> getAllAudioFiles({int limit = 0}) async {
     List<AudioFile> audioList = [];
 
-    List<String> paths = await ExternalPath.getExternalStorageDirectories();
+    // List<String> paths = await ExternalPath.getExternalStorageDirectories();
 
-    final Directory internalDir = Directory(paths[0]);
-    final Directory externalDir = Directory(paths[1]);
+    // final Directory internalDir = Directory(paths[0]);
+    // final Directory externalDir = Directory(paths[1]);
 
-    if (await internalDir.exists()) {
-      await _fetchAudioFiles(internalDir, audioList, limit);
-    }
-
-    if (await externalDir.exists()) {
-      await _fetchAudioFiles(externalDir, audioList, limit);
-    }
+    // if (await internalDir.exists()) {
+    //   await _fetchAudioFiles(internalDir, audioList, limit);
+    // }
+    //
+    // if (await externalDir.exists()) {
+    //   await _fetchAudioFiles(externalDir, audioList, limit);
+    // }
     return audioList;
   }
 

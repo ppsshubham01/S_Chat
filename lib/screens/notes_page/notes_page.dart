@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 
 import '../../res/components/round_text_form_field.dart';
 import '../../services/database_services.dart';
+import '../../widget/global_widget.dart';
 import 'edit_notes_page.dart';
 
 class NotesPage extends StatefulWidget {
@@ -37,40 +38,9 @@ class _NotesPageState extends State<NotesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        FocusManager.instance.primaryFocus?.unfocus();
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.green,
-          title: const Text(
-            'Your Notes',
-            style: TextStyle(
-              color: Colors.black54,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          actions: [
-            IconButton(
-              onPressed: () async {
-                var finalData = await Get.to(() => const NotesEditScreen());
-                if (finalData != null) {
-                  setState(() => notesOfList.add(finalData));
-                }
-              },
-              icon: const Icon(Icons.add),
-            ),
-            PopupMenuButton<String>(  
-              itemBuilder: (context) => [
-                const PopupMenuItem(value: "View Gride/List", child: Text("View")),
-                const PopupMenuItem(value: "Sync with Google", child: Text("Sync")),
-              ],
-            )
-          ],
-        ),
-        body: Column(
+    return GlobalWidgets.parentContainer(
+        context,
+        Column(
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -108,14 +78,16 @@ class _NotesPageState extends State<NotesPage> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           shape: RoundedRectangleBorder(
-                            side: const BorderSide(color: Colors.black, width: 1),
+                            side:
+                                const BorderSide(color: Colors.black, width: 1),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           onTap: () {
                             Get.to(() => NotesEditScreen(note: notesIndex));
                           },
                           trailing: IconButton(
-                            onPressed: () => _showDeleteDialog(context, notesIndex),
+                            onPressed: () =>
+                                _showDeleteDialog(context, notesIndex),
                             icon: const Icon(Icons.delete, color: Colors.red),
                           ),
                         ),
@@ -126,9 +98,45 @@ class _NotesPageState extends State<NotesPage> {
               ),
             ),
           ],
-        ),
-      ),
-    );
+        ));
+
+    //   GestureDetector(
+    //   onTap: () {
+    //     FocusManager.instance.primaryFocus?.unfocus();
+    //   },
+    //   child: Scaffold(
+    //     appBar: AppBar(
+    //       automaticallyImplyLeading: false,
+    //       backgroundColor: Colors.green,
+    //       title: const Text(
+    //         'Your Notes',
+    //         style: TextStyle(
+    //           color: Colors.black54,
+    //           fontWeight: FontWeight.bold,
+    //         ),
+    //       ),
+    //       actions: [
+    //         IconButton(
+    //           onPressed: () async {
+    //             var finalData = await Get.to(() => const NotesEditScreen());
+    //             if (finalData != null) {
+    //               setState(() => notesOfList.add(finalData));
+    //             }
+    //           },
+    //           icon: const Icon(Icons.add),
+    //         ),
+    //         PopupMenuButton<String>(
+    //           itemBuilder: (context) => [
+    //             const PopupMenuItem(value: "View Gride/List", child: Text("View")),
+    //             const PopupMenuItem(value: "Sync with Google", child: Text("Sync")),
+    //           ],
+    //         )
+    //       ],
+    //     ),
+    //     body:
+    //   ),
+    // )
+    // ;
   }
 
   void _showDeleteDialog(BuildContext context, QueryDocumentSnapshot? note) {
